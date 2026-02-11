@@ -1,4 +1,4 @@
-package br.com.codenest;
+package br.com.codenest.marknow;
 
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 

@@ -1,0 +1,15 @@
+package br.com.codenest.marknow.dto.exception;
+
+import java.time.Instant;
+import java.util.List;
+
+public record ErrorResponse(String timestamp, int status, String error, String code, String message, String path,
+                            String correlationId, List<FieldError> fieldErrors) {
+    public static ErrorResponse of(int status, String error, String code, String message, String path,
+                                   String correlationId, List<FieldError> fieldErrors) {
+        return new ErrorResponse(Instant.now().toString(), status, error, code, message, path, correlationId, fieldErrors);
+    }
+
+    public record FieldError(String field, String message, Object rejectedValue) {
+    }
+}
