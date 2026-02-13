@@ -1,11 +1,13 @@
 package br.com.codenest.marknow.dto.exception;
 
+import br.com.codenest.marknow.exception.ErrorCode;
+
 import java.time.Instant;
 import java.util.List;
 
-public record ErrorResponse(String timestamp, int status, String error, String code, String message, String path,
+public record ErrorResponse(String timestamp, int status, String error, ErrorCode code, String message, String path,
                             String correlationId, List<FieldError> fieldErrors) {
-    public static ErrorResponse of(int status, String error, String code, String message, String path,
+    public static ErrorResponse of(int status, String error, ErrorCode code, String message, String path,
                                    String correlationId, List<FieldError> fieldErrors) {
         return new ErrorResponse(Instant.now().toString(), status, error, code, message, path, correlationId, fieldErrors);
     }

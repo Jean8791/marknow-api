@@ -23,7 +23,7 @@ public class ConstraintViolationExceptionMapper extends BaseExceptionMapper
         ErrorResponse body = ErrorResponse.of(
                 400,
                 "Bad Request",
-                "VALIDATION_ERROR",
+                ErrorCode.BAD_REQUEST,
                 "Falha de validação",
                 path(),
                 correlationId(),

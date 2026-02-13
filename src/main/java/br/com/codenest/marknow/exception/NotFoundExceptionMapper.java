@@ -17,7 +17,7 @@ public class NotFoundExceptionMapper extends BaseExceptionMapper implements Exce
         ErrorResponse body = ErrorResponse.of(
                 404,
                 "Not Found",
-                "NOT_FOUND",
+                ErrorCode.NOT_FOUND,
                 "Recurso não encontrado",
                 path(),
                 correlationId(),
