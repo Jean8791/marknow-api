@@ -23,7 +23,7 @@ public class UnhandledExceptionMapper extends BaseExceptionMapper
         ErrorResponse body = ErrorResponse.of(
                 500,
                 "Internal Server Error",
-                "INTERNAL_ERROR",
+                ErrorCode.INTERNAL_ERROR,
                 "Erro interno inesperado",
                 path(),
                 cid,

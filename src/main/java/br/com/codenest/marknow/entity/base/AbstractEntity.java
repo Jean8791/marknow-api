@@ -4,16 +4,15 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.PrePersist;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -22,6 +21,7 @@ import java.util.UUID;
 public abstract class AbstractEntity extends PanacheEntityBase implements Serializable {
 
     @Id
+    @UuidGenerator
     @Column(length = 36, nullable = false, updatable = false)
     protected String oid;
 
@@ -38,12 +38,5 @@ public abstract class AbstractEntity extends PanacheEntityBase implements Serial
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     protected Instant updatedAt;
-
-    @PrePersist
-    public void beforePersist() {
-        if (this.oid == null) {
-            this.oid = UUID.randomUUID().toString();
-        }
-    }
 
 }

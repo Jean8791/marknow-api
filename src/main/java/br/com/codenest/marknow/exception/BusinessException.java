@@ -1,16 +1,16 @@
 package br.com.codenest.marknow.exception;
 
 public class BusinessException extends RuntimeException {
-    private final String code;
+    private final ErrorCode code;
     private final int status;
 
-    public BusinessException(String code, String message, int status) {
+    public BusinessException(ErrorCode code, String message) {
         super(message);
         this.code = code;
-        this.status = status;
+        this.status = code.getHttpStatus();
     }
 
-    public String getCode() {
+    public ErrorCode getCode() {
         return code;
     }
 
@@ -18,11 +18,7 @@ public class BusinessException extends RuntimeException {
         return status;
     }
 
-    public static BusinessException unprocessable(String code, String message) {
-        return new BusinessException(code, message, 422);
-    }
-
-    public static BusinessException conflict(String code, String message) {
-        return new BusinessException(code, message, 409);
+    public static BusinessException of(ErrorCode code, String message) {
+        return new BusinessException(code, message);
     }
 }

@@ -1,0 +1,78 @@
+package br.com.codenest.marknow.service;
+
+import br.com.codenest.marknow.dto.usuario.UsuarioCreateResquest;
+import br.com.codenest.marknow.dto.usuario.UsuarioResponse;
+import br.com.codenest.marknow.dto.usuario.UsuarioUpdateResquest;
+import br.com.codenest.marknow.entity.Usuario;
+import br.com.codenest.marknow.exception.BusinessException;
+import br.com.codenest.marknow.exception.ErrorCode;
+import br.com.codenest.marknow.mapper.UsuarioMapper;
+import br.com.codenest.marknow.repository.UsuarioRepository;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+
+import java.util.List;
+
+@ApplicationScoped
+public class UsuarioService {
+
+    @Inject
+    UsuarioRepository repo;
+
+    @Inject
+    UsuarioMapper mapper;
+
+    @Transactional
+    public UsuarioResponse create(UsuarioCreateResquest req) {
+        validacaoCreat(req);
+        Usuario usuario = mapper.toEntity(req);
+        repo.persist(usuario);
+        return mapper.toResponse(usuario);
+    }
+
+    @Transactional
+    public UsuarioResponse update(String oid, UsuarioUpdateResquest req) {
+        Usuario usuario = repo.findById(oid);
+        validacaoUpdate(usuario, req);
+        mapper.toUpdateEntity(usuario, req);
+        return mapper.toResponse(usuario);
+    }
+
+    public UsuarioResponse get(String oid) {
+        Usuario usuario = repo.findById(oid);
+        if (usuario == null) throw BusinessException.of(ErrorCode.NOT_FOUND, "Usuário não encontrado.");
+        return mapper.toResponse(usuario);
+    }
+
+    public List<UsuarioResponse> list(int page, int size, String sort) {
+        return repo.findAll(page, size, sort).stream().map(mapper::toResponse).toList();
+    }
+
+    @Transactional
+    public void delete(String oid) {
+        boolean deletado = repo.deleteById(oid);
+        if (!deletado) throw BusinessException.of(ErrorCode.NOT_FOUND, "Usuário não encontrado.");
+    }
+
+
+    private void validacaoCreat(UsuarioCreateResquest req) {
+        if (req == null) {
+            throw BusinessException.of(ErrorCode.INTERNAL_ERROR, "Erro inesperado.");
+        }
+
+        if (repo.existsByEmail(req.getEmail())) {
+            throw BusinessException.of(ErrorCode.CONFLICT, "Já existe usuário cadastrado com este e-mail.");
+        }
+    }
+
+    private void validacaoUpdate(Usuario usuario, UsuarioUpdateResquest req) {
+        if (req == null) {
+            throw BusinessException.of(ErrorCode.INTERNAL_ERROR, "Erro inesperado.");
+        }
+
+        if (repo.existsByEmailEmOutroRegistro(usuario.getOid(), req.getEmail())) {
+            throw BusinessException.of(ErrorCode.CONFLICT, "Já existe usuário cadastrado com este e-mail.");
+        }
+    }
+}

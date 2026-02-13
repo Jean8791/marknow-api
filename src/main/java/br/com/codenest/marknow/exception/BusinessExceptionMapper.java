@@ -15,7 +15,6 @@ public class BusinessExceptionMapper extends BaseExceptionMapper
     private String reasonPhrase(int status) {
         Response.Status rs = Response.Status.fromStatusCode(status);
         if (rs != null) return rs.getReasonPhrase();
-        // JAX-RS Response.Status doesn't include 422
         if (status == 422) return "Unprocessable Entity";
         return "Error";
     }
@@ -26,7 +25,7 @@ public class BusinessExceptionMapper extends BaseExceptionMapper
         int status = ex.getStatus();
         String error = reasonPhrase(status);
 
-        ErrorResponse body = ErrorResponse.of(status, error, ex.getCode() != null ? ex.getCode() : "BUSINESS_ERROR",
+        ErrorResponse body = ErrorResponse.of(status, error, ex.getCode() != null ? ex.getCode() : ErrorCode.BAD_REQUEST,
                 ex.getMessage(), path(), correlationId(), List.of());
 
         return Response.status(status)
