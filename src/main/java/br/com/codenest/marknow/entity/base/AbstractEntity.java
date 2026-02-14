@@ -1,14 +1,10 @@
 package br.com.codenest.marknow.entity.base;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.io.Serializable;
@@ -25,18 +21,26 @@ public abstract class AbstractEntity extends PanacheEntityBase implements Serial
     @Column(length = 36, nullable = false, updatable = false)
     protected String oid;
 
-    @Column(name = "created_by", length = 36)
-    protected String createdBy;
+    @Column(name = "criado_por", length = 36)
+    public String criadoPor;
 
-    @Column(name = "updated_by", length = 36)
-    protected String updatedBy;
+    @Column(name = "atualizado_por", length = 36)
+    public String atualizadoPor;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    protected Instant createdAt;
+    @Column(name = "criado_em", nullable = false)
+    public Instant criadoEm;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    protected Instant updatedAt;
+    @Column(name = "atualizado_em", nullable = false)
+    public Instant atualizadoEm;
 
+    @PrePersist
+    void onCreate() {
+        Instant now = Instant.now();
+        if (criadoEm == null) criadoEm = now;
+    }
+
+    @PreUpdate
+    void onUpdate() {
+        atualizadoEm = Instant.now();
+    }
 }

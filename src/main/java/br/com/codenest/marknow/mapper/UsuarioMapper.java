@@ -29,8 +29,8 @@ public class UsuarioMapper {
         usuarioResponse.setNome(usuario.getNome());
         usuarioResponse.setEmail(usuario.getEmail());
         usuarioResponse.setStatus(usuario.getStatus());
-        usuarioResponse.setCreatedAt(usuario.getCreatedAt());
-        usuarioResponse.setUpdatedAt(usuario.getUpdatedAt());
+        usuarioResponse.setCreatedAt(usuario.getCriadoEm());
+        usuarioResponse.setUpdatedAt(usuario.getAtualizadoEm());
 
         return usuarioResponse;
     }

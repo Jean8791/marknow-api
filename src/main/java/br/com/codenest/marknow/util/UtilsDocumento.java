@@ -23,7 +23,7 @@ public final class UtilsDocumento {
         if (d == null) return null;
         if (d.length() == 11) return aplicarMascara("###.###.###-##", d);
         if (d.length() == 14) return aplicarMascara("##.###.###/####-##", d);
-        return d; // normalizado, mas tamanho inesperado
+        return d;
     }
 
     public static String formatarCep(String v) {

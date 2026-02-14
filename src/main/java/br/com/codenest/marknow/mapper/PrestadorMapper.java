@@ -31,8 +31,8 @@ public class PrestadorMapper {
         prestadorResponse.setDocumento(prestador.getDocumento());
         prestadorResponse.setTipoPessoa(prestador.getTipoPessoa());
         prestadorResponse.setStatus(prestador.getStatus());
-        prestadorResponse.setCreatedAt(prestador.getCreatedAt());
-        prestadorResponse.setUpdatedAt(prestador.getUpdatedAt());
+        prestadorResponse.setCreatedAt(prestador.getCriadoEm());
+        prestadorResponse.setUpdatedAt(prestador.getAtualizadoEm());
         return prestadorResponse;
     }
 }

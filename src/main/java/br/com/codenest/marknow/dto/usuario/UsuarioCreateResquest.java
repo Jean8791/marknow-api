@@ -1,8 +1,8 @@
 package br.com.codenest.marknow.dto.usuario;
 
 import br.com.codenest.marknow.util.UtilsString;
+import br.com.codenest.marknow.validation.EmailStrict;
 import com.fasterxml.jackson.annotation.JsonSetter;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 public class UsuarioCreateResquest {
 
     @NotBlank
-    @Email
+    @EmailStrict
     @Schema(required = true, example = "admin@prestador.com")
     public String email;
 
@@ -30,12 +30,12 @@ public class UsuarioCreateResquest {
 
     @JsonSetter("email")
     public void setEmail(String email) {
-        this.email = UtilsString.slugParaNull(email);
+        this.email = UtilsString.apararParaNull(email);
     }
 
     @JsonSetter("nome")
     public void setNome(String nome) {
-        this.nome = UtilsString.slugParaNull(nome);
+        this.nome = UtilsString.apararParaNull(nome);
     }
 
     @JsonSetter("senha")
