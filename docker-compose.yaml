@@ -8,5 +8,15 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  database_test:
+    image: postgres:16-alpine
+    env_file:
+      - ../.env.test
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata_test:/var/lib/postgresql/data
+
 volumes:
   pgdata:
+  pgdata_test:
