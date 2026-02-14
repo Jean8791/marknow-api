@@ -95,7 +95,8 @@ public class AuthService {
         if (!policy.isAtiva(a, Instant.now())) throw new RuntimeException("Assinatura inválida");
     }
 
-    private String gerarToken(Usuario usuario) {
+    @Transactional
+    public String gerarToken(Usuario usuario) {
         return Jwt.issuer("marknow")
                 .subject(usuario.email)
                 .claim("usuarioOid", usuario.getOid())
