@@ -30,7 +30,7 @@ public abstract class AbstractEntity extends PanacheEntityBase implements Serial
     @Column(name = "criado_em", nullable = false)
     public Instant criadoEm;
 
-    @Column(name = "atualizado_em", nullable = false)
+    @Column(name = "atualizado_em")
     public Instant atualizadoEm;
 
     @PrePersist

@@ -4,7 +4,6 @@ import br.com.codenest.marknow.dto.auth.LoginRequest;
 import br.com.codenest.marknow.dto.auth.LoginResponse;
 import br.com.codenest.marknow.service.auth.AuthService;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;

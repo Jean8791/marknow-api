@@ -13,13 +13,11 @@ public class AssinaturaPolitica {
 
         if (a.status == AssinaturaStatus.CANCELADA || a.status == AssinaturaStatus.SUSPENSA) return false;
 
-        // TRIAL e ATIVA valem, desde que dentro do período (ou grace)
+        if (a.fimPeriodoAtual == null) return false;
         boolean dentroPeriodo = !a.fimPeriodoAtual.isBefore(now);
         if (dentroPeriodo) return a.status == AssinaturaStatus.TRIAL || a.status == AssinaturaStatus.ATIVA;
 
-        // grace (se existir)
-        //if (a.graceUntil != null && !a.graceUntil.isBefore(now)) return true;
-
-        return false;
+        // tolerancia
+        return a.toleranciaAte != null && !a.toleranciaAte.isBefore(now);
     }
 }
