@@ -3,10 +3,16 @@ package br.com.codenest.marknow.entity;
 import br.com.codenest.marknow.entity.base.AbstractEntity;
 import br.com.codenest.marknow.enums.AssinaturaStatus;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.Instant;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "assinatura")
 public class Assinatura extends AbstractEntity {
 
