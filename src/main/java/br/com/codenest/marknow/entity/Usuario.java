@@ -26,4 +26,13 @@ public class Usuario extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     public UsuarioStatus status;
+
+    public Boolean admin;
+
+    @PrePersist
+    public void beforePersist() {
+        if (this.status == null) {
+            this.status = UsuarioStatus.ATIVO;
+        }
+    }
 }

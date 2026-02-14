@@ -1,5 +1,5 @@
 package br.com.codenest.marknow.enums;
 
 public enum PrestadorUsuarioStatus {
-    ATIVO, INATIVO, BLOQUEADO
+    ATIVO, BLOQUEADO
 }

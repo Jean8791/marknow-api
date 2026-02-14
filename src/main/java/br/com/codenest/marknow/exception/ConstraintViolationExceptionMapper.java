@@ -38,6 +38,11 @@ public class ConstraintViolationExceptionMapper extends BaseExceptionMapper
 
     private ErrorResponse.FieldError toFieldError(ConstraintViolation<?> v) {
         String field = v.getPropertyPath() != null ? v.getPropertyPath().toString() : null;
-        return new ErrorResponse.FieldError(field, v.getMessage(), null);
+
+        Object invalid = v.getInvalidValue();
+        String rejectedValue = (invalid == null) ? null : String.valueOf(invalid);
+
+        return new ErrorResponse.FieldError(field, v.getMessage(), rejectedValue);
     }
+
 }

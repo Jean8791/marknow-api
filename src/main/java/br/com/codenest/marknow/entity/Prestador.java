@@ -18,7 +18,7 @@ public class Prestador extends AbstractEntity {
     @Column(name = "nome", nullable = false, length = 120)
     private String nome;
 
-    @Column(name = "documento", length = 2)
+    @Column(name = "documento", length = 14)
     public String documento;
 
     @Enumerated(EnumType.STRING)
@@ -32,7 +32,7 @@ public class Prestador extends AbstractEntity {
     @PrePersist
     public void beforePersist() {
         if (this.status == null) {
-            this.status = PrestadorStatus.ATIVO;
+            this.status = PrestadorStatus.BLOQUEADO;
         }
     }
 }

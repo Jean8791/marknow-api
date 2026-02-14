@@ -16,7 +16,6 @@ public class UsuarioResponse {
     public String oid;
     public String email;
     public String nome;
-    public String senha;
     public UsuarioStatus status;
     public Instant createdAt;
     public Instant updatedAt;

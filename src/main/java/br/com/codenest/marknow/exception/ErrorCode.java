@@ -8,6 +8,12 @@ public enum ErrorCode {
     // 404 - recurso não encontrado
     NOT_FOUND(404),
 
+    //Acesso não autorizado
+    UNAUTHORIZED(401),
+
+    // 403 - acesso negado
+    FORBIDDEN(403),
+
     // 409 - conflito de estado (concorrência, já existe, já reservado, etc.)
     CONFLICT(409),
 
