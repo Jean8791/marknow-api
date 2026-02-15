@@ -11,13 +11,15 @@ public class AssinaturaPolitica {
     public boolean isAtiva(Assinatura a, Instant now) {
         if (a == null) return false;
 
-        if (a.status == AssinaturaStatus.CANCELADA || a.status == AssinaturaStatus.SUSPENSA) return false;
+        if (AssinaturaStatus.CANCELADA.equals(a.getStatus()) || AssinaturaStatus.SUSPENSA.equals(a.getStatus())) {
+            return false;
+        }
 
-        if (a.fimPeriodoAtual == null) return false;
-        boolean dentroPeriodo = !a.fimPeriodoAtual.isBefore(now);
-        if (dentroPeriodo) return a.status == AssinaturaStatus.TRIAL || a.status == AssinaturaStatus.ATIVA;
+        if (a.getFimPeriodoAtual() == null) return false;
+        boolean dentroPeriodo = !a.getFimPeriodoAtual().isBefore(now);
+        if (dentroPeriodo)
+            return AssinaturaStatus.TRIAL.equals(a.getStatus()) || AssinaturaStatus.ATIVA.equals(a.getStatus());
 
-        // tolerancia
-        return a.toleranciaAte != null && !a.toleranciaAte.isBefore(now);
+        return a.getToleranciaAte() != null && !a.getToleranciaAte().isBefore(now);
     }
 }

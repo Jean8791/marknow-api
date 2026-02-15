@@ -28,30 +28,30 @@ public class AssinaturaScheduler {
         for (Assinatura a : assinaturas) {
             boolean ativa = politica.isAtiva(a, now);
 
-            Prestador p = Prestador.findById(a.oidPrestador);
+            Prestador p = Prestador.findById(a.getOidPrestador());
             if (p == null) continue;
 
             if (!ativa) {
                 // marca inadimplente se ainda não estiver
-                if (a.status != AssinaturaStatus.INADIMPLENTE && a.status != AssinaturaStatus.CANCELADA) {
-                    a.status = AssinaturaStatus.INADIMPLENTE;
-                    a.atualizadoEm = now;
+                if (!AssinaturaStatus.INADIMPLENTE.equals(a.getStatus()) && !AssinaturaStatus.CANCELADA.equals(a.getStatus())) {
+                    a.setStatus(AssinaturaStatus.INADIMPLENTE);
+                    a.setAtualizadoEm(now);
                 }
                 // bloqueia prestador
-                if (p.status != PrestadorStatus.BLOQUEADO) {
-                    p.status = PrestadorStatus.BLOQUEADO;
-                    p.atualizadoEm = now;
+                if (!PrestadorStatus.BLOQUEADO.equals(p.getStatus())) {
+                    p.setStatus(PrestadorStatus.BLOQUEADO);
+                    p.setAtualizadoEm(now);
                 }
             } else {
                 // assinatura ok -> prestador ativo
-                if (p.status == PrestadorStatus.BLOQUEADO) {
-                    p.status = PrestadorStatus.ATIVO;
-                    p.atualizadoEm = now;
+                if (PrestadorStatus.BLOQUEADO.equals(p.getStatus())) {
+                    p.setStatus(PrestadorStatus.ATIVO);
+                    p.setAtualizadoEm(now);
                 }
                 // se estava INADIMPLENTE mas já está ativa, normaliza
-                if (a.status == AssinaturaStatus.INADIMPLENTE) {
-                    a.status = AssinaturaStatus.ATIVA;
-                    a.atualizadoEm = now;
+                if (AssinaturaStatus.INADIMPLENTE.equals(a.getStatus())) {
+                    a.setStatus(AssinaturaStatus.ATIVA);
+                    a.setAtualizadoEm(now);
                 }
             }
         }

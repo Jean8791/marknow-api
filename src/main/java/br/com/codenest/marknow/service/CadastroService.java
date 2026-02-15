@@ -6,9 +6,17 @@ import br.com.codenest.marknow.entity.Assinatura;
 import br.com.codenest.marknow.entity.Prestador;
 import br.com.codenest.marknow.entity.PrestadorUsuario;
 import br.com.codenest.marknow.entity.Usuario;
-import br.com.codenest.marknow.enums.*;
+import br.com.codenest.marknow.enums.AssinaturaStatus;
+import br.com.codenest.marknow.enums.PrestadorUsuarioRole;
+import br.com.codenest.marknow.exception.BusinessException;
+import br.com.codenest.marknow.exception.ErrorCode;
+import br.com.codenest.marknow.mapper.PrestadorMapper;
+import br.com.codenest.marknow.mapper.UsuarioMapper;
+import br.com.codenest.marknow.repository.AssinaturaRepository;
+import br.com.codenest.marknow.repository.PrestadorRepository;
+import br.com.codenest.marknow.repository.PrestadorUsuarioRepository;
+import br.com.codenest.marknow.repository.UsuarioRepository;
 import br.com.codenest.marknow.service.auth.AuthService;
-import br.com.codenest.marknow.util.UtilsRandom;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -22,90 +30,70 @@ public class CadastroService {
 
     @Inject
     AuthService authService;
+    @Inject
+    UsuarioRepository usuarioRepository;
+    @Inject
+    PrestadorRepository prestadorRepository;
+    @Inject
+    PrestadorUsuarioRepository prestadorUsuarioRepository;
+    @Inject
+    AssinaturaRepository assinaturaRepository;
+    @Inject
+    UsuarioMapper usuarioMapper;
+    @Inject
+    PrestadorMapper prestadorMapper;
 
     @Transactional
     public CadastroResponse create(@Valid CadastroCreateRequest req) {
 
-        Instant agora = Instant.now();
-
-        // 1) valida email único (case-insensitive) - evita exception feia do banco
-        String email = req.getUsuario().getEmail().trim().toLowerCase();
-        boolean emailExiste = Usuario.find("lower(email) = ?1", email).count() > 0;
-        if (emailExiste) {
-            throw new IllegalArgumentException("Email já cadastrado");
+        if (req == null || req.getUsuario() == null || req.getPrestador() == null) {
+            throw BusinessException.of(ErrorCode.UNPROCESSABLE, "Payload inválido (usuario e prestador são obrigatórios).");
         }
 
-        // 2) cria Prestador (tenant)
-        Prestador prestador = new Prestador();
-        prestador.setOid(UtilsRandom.uuid());
-        prestador.setNome(req.getPrestador().getNome());
-        prestador.setDocumento(req.getPrestador().getDocumento()); // normaliza se quiser
-        prestador.setTipoPessoa(req.getPrestador().getTipoPessoa());
-        prestador.setStatus(PrestadorStatus.ATIVO);
+        String email = req.getUsuario().getEmail();
+        if (email == null || email.isBlank()) {
+            throw BusinessException.of(ErrorCode.UNPROCESSABLE, "email é obrigatório.");
+        }
 
-        // auditoria: no bootstrap você pode deixar criadoPor null e depois exigir NOT NULL via V4
-        prestador.setCriadoPor(null);
-        prestador.setCriadoEm(agora);
-        prestador.setAtualizadoEm(agora);
+        // Se o email é único por tenant, você NÃO pode checar global.
+        // Mas no cadastro inicial ainda não tem tenant. Então pode checar global mesmo.
+        // Depois, no endpoint de criar usuário dentro do prestador, use existsByPrestadorAndEmail.
+        if (usuarioRepository.existsByEmail(email)) {
+            throw BusinessException.of(ErrorCode.CONFLICT, "Já existe usuário cadastrado com este e-mail.");
+        }
 
-        prestador.persist();
+        // 1) cria prestador
+        Prestador prestador = prestadorMapper.toEntity(req.getPrestador());
+        prestadorRepository.persist(prestador);
 
-        // 3) cria Usuario (admin do prestador)
-        Usuario usuario = new Usuario();
-        usuario.setOid(UtilsRandom.uuid());
-        usuario.setEmail(email);
-        usuario.setNome(req.getUsuario().getNome());
-        usuario.setStatus(UsuarioStatus.ATIVO);
-        usuario.setAdmin(false);
+        // 2) cria usuario (tenant obrigatório!)
+        Usuario usuario = usuarioMapper.toEntity(req.getUsuario());
+        usuario.setOidPrestador(prestador.getOid());  // vem do AbstractTenantEntity
+        usuario.setCriadoPor("SYSTEM");               // ou usuario.getOid() não existe ainda; defina uma regra
+        usuarioRepository.persist(usuario);
 
-        // TODO: hash de senha (não guarde puro)
-        usuario.setSenha(req.getUsuario().getSenha());
-
-        usuario.setCriadoPor(null);
-        usuario.setCriadoEm(agora);
-        usuario.setAtualizadoEm(agora);
-
-        usuario.persist();
-
-        // 4) vínculo ADMIN usuário x prestador
+        // 3) vínculo prestador_usuario (FK manda)
         PrestadorUsuario pu = new PrestadorUsuario();
-        pu.setOid(UtilsRandom.uuid());
-        pu.setPrestador(prestador);
-        pu.setUsuario(usuario);
+        pu.setOidPrestador(prestador.getOid());
+        pu.setOidUsuario(usuario.getOid());
         pu.setRole(PrestadorUsuarioRole.ADMIN);
-        pu.setStatus(PrestadorUsuarioStatus.ATIVO);
+        // status default no @PrePersist
+        prestadorUsuarioRepository.persist(pu);
 
-        pu.setCriadoPor(usuario.getOid());
-        pu.setCriadoEm(agora);
-        pu.setAtualizadoEm(agora);
+        // 4) assinatura (tenant obrigatório!)
+        Instant agora = Instant.now();
+        int diasTrial = req.getDiasTrial() != null ? req.getDiasTrial() : 7;
 
-        pu.persist();
-
-        // 5) cria Assinatura TRIAL
         Assinatura assinatura = new Assinatura();
-        assinatura.setOid(UtilsRandom.uuid());
         assinatura.setOidPrestador(prestador.getOid());
+        assinatura.setCriadoPor(usuario.getOid());
         assinatura.setPlano(req.getPlano());
         assinatura.setStatus(AssinaturaStatus.TRIAL);
-
-        assinatura.setFimPeriodoAtual(agora.plus(req.getDiasTrial(), ChronoUnit.DAYS));
-        assinatura.setToleranciaAte(null);
-
+        assinatura.setFimPeriodoAtual(agora.plus(diasTrial, ChronoUnit.DAYS));
         assinatura.setProvedor("INTERNO");
-        assinatura.setReferenciaProvedor(null);
+        assinaturaRepository.persist(assinatura);
 
-        assinatura.setCriadoPor(usuario.getOid());
-        assinatura.setCriadoEm(agora);
-        assinatura.setAtualizadoEm(agora);
-
-        assinatura.persist();
-
-        // 6) gera token e responde
         String token = authService.gerarToken(usuario);
-
-        CadastroResponse resp = new CadastroResponse();
-        resp.setOid(prestador.getOid()); // aqui "oid" é do prestador
-        resp.setToken(token);
-        return resp;
+        return new CadastroResponse(prestador.getOid(), token);
     }
 }

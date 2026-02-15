@@ -23,7 +23,6 @@ public class PrestadorCreateRequest {
     private String documento;
 
     @NotNull(message = "tipoPessoa é obrigatório")
-    @Pattern(regexp = "^(PF|PJ)$", message = "tipoPessoa deve ser PF ou PJ")
     private TipoPessoa tipoPessoa;
 
     @JsonSetter("nome")
@@ -34,6 +33,11 @@ public class PrestadorCreateRequest {
     @JsonSetter("documento")
     public void setDocumento(String documento) {
         this.documento = UtilsString.slugParaNull(documento);
+    }
+
+    @JsonSetter("tipoPessoa")
+    public void setTipoPessoa(TipoPessoa tipoPessoa) {
+        this.tipoPessoa = tipoPessoa;
     }
 
     @AssertTrue(message = "documento incompatível com tipoPessoa (PF=CPF, PJ=CNPJ)")

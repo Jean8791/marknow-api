@@ -17,7 +17,7 @@ public class CadastroResourceTest {
                     {
                       "prestador": {
                         "nome": "Empresa Teste LTDA",
-                        "documento": "12345678000199",
+                        "documento": "19892172000145",
                         "tipoPessoa": "PJ"
                       },
                       "usuario": {
@@ -64,7 +64,7 @@ public class CadastroResourceTest {
 
         String body = """
                     {
-                      "prestador": { "nome": "Empresa 1", "documento": "12345678000199", "tipoPessoa": "PJ" },
+                      "prestador": { "nome": "Empresa 1", "documento": "19892172000145", "tipoPessoa": "PJ" },
                       "usuario": { "nome": "Admin", "email": "dup@empresa.com", "senha": "123456" },
                       "plano": "BASICO",
                       "diasTrial": 7
