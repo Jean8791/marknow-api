@@ -55,32 +55,24 @@ public class CadastroService {
             throw BusinessException.of(ErrorCode.UNPROCESSABLE, "email é obrigatório.");
         }
 
-        // Se o email é único por tenant, você NÃO pode checar global.
-        // Mas no cadastro inicial ainda não tem tenant. Então pode checar global mesmo.
-        // Depois, no endpoint de criar usuário dentro do prestador, use existsByPrestadorAndEmail.
         if (usuarioRepository.existsByEmail(email)) {
             throw BusinessException.of(ErrorCode.CONFLICT, "Já existe usuário cadastrado com este e-mail.");
         }
 
-        // 1) cria prestador
         Prestador prestador = prestadorMapper.toEntity(req.getPrestador());
         prestadorRepository.persist(prestador);
 
-        // 2) cria usuario (tenant obrigatório!)
         Usuario usuario = usuarioMapper.toEntity(req.getUsuario());
-        usuario.setOidPrestador(prestador.getOid());  // vem do AbstractTenantEntity
-        usuario.setCriadoPor("SYSTEM");               // ou usuario.getOid() não existe ainda; defina uma regra
+        usuario.setOidPrestador(prestador.getOid());
+        usuario.setCriadoPor("SYSTEM");
         usuarioRepository.persist(usuario);
 
-        // 3) vínculo prestador_usuario (FK manda)
         PrestadorUsuario pu = new PrestadorUsuario();
         pu.setOidPrestador(prestador.getOid());
         pu.setOidUsuario(usuario.getOid());
         pu.setRole(PrestadorUsuarioRole.ADMIN);
-        // status default no @PrePersist
         prestadorUsuarioRepository.persist(pu);
 
-        // 4) assinatura (tenant obrigatório!)
         Instant agora = Instant.now();
         int diasTrial = req.getDiasTrial() != null ? req.getDiasTrial() : 7;
 
