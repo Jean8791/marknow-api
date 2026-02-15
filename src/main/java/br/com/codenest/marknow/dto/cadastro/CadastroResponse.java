@@ -10,4 +10,9 @@ import lombok.Setter;
 public class CadastroResponse {
     private String oid;
     private String token;
+
+    public CadastroResponse(String oid, String token) {
+        this.oid = oid;
+        this.token = token;
+    }
 }

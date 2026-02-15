@@ -7,5 +7,5 @@ import jakarta.enterprise.context.RequestScoped;
 public class TenantContext {
     public String prestadorOid;
     public Usuario usuario;
-    public boolean superAdmin;
+    public Boolean superAdmin;
 }

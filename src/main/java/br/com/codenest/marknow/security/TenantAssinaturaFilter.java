@@ -36,7 +36,7 @@ public class TenantAssinaturaFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext ctx) {
 
         String path = ctx.getUriInfo().getPath();
-        if (path.startsWith("auth")) return;
+        if (path.startsWith("/auth") || path.startsWith("/cadastro")) return;
 
         String prestadorOid = ctx.getHeaderString("X-Prestador-Oid");
         if (prestadorOid == null || prestadorOid.isBlank()) {
@@ -51,19 +51,19 @@ public class TenantAssinaturaFilter implements ContainerRequestFilter {
         }
 
         Usuario u = Usuario.findById(usuarioOid);
-        if (u == null || u.status != UsuarioStatus.ATIVO) {
+        if (u == null || !UsuarioStatus.ATIVO.equals(u.getStatus())) {
             abort(ctx, "Usuário bloqueado");
             return;
         }
 
         tenantContext.usuario = u;
         tenantContext.prestadorOid = prestadorOid;
-        tenantContext.superAdmin = u.getAdmin();
+        tenantContext.superAdmin = u.getAdmin() != null ? u.getAdmin() : false;
 
         if (tenantContext.superAdmin) return;
 
         Prestador p = Prestador.findById(prestadorOid);
-        if (p == null || p.status != PrestadorStatus.ATIVO) {
+        if (p == null || !PrestadorStatus.ATIVO.equals(p.getStatus())) {
             abort(ctx, "Prestador bloqueado");
             return;
         }
@@ -72,7 +72,7 @@ public class TenantAssinaturaFilter implements ContainerRequestFilter {
                 .find("oidPrestador=?1 and oidUsuario=?2", prestadorOid, usuarioOid)
                 .firstResult();
 
-        if (pu == null || pu.status != PrestadorUsuarioStatus.ATIVO) {
+        if (pu == null || pu.getStatus() != PrestadorUsuarioStatus.ATIVO) {
             abort(ctx, "Sem acesso ao prestador");
             return;
         }

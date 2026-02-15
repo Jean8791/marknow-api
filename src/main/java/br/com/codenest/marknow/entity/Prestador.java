@@ -19,15 +19,15 @@ public class Prestador extends AbstractEntity {
     private String nome;
 
     @Column(name = "documento", length = 14)
-    public String documento;
+    private String documento;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_pessoa", nullable = false, length = 2)
-    public TipoPessoa tipoPessoa;
+    private TipoPessoa tipoPessoa;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    public PrestadorStatus status;
+    private PrestadorStatus status;
 
     @PrePersist
     public void beforePersist() {

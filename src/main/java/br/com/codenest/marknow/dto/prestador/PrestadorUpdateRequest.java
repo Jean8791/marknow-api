@@ -30,7 +30,6 @@ public class PrestadorUpdateRequest {
     private String documento;
 
     @NotNull(message = "tipoPessoa é obrigatório")
-    @Pattern(regexp = "^(PF|PJ)$", message = "tipoPessoa deve ser PF ou PJ")
     private TipoPessoa tipoPessoa;
 
     @JsonSetter("oid")
