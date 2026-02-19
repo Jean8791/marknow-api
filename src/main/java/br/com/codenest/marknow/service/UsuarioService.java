@@ -3,11 +3,14 @@ package br.com.codenest.marknow.service;
 import br.com.codenest.marknow.dto.usuario.UsuarioCreateResquest;
 import br.com.codenest.marknow.dto.usuario.UsuarioResponse;
 import br.com.codenest.marknow.dto.usuario.UsuarioUpdateResquest;
+import br.com.codenest.marknow.entity.Prestador;
 import br.com.codenest.marknow.entity.Usuario;
 import br.com.codenest.marknow.exception.BusinessException;
 import br.com.codenest.marknow.exception.ErrorCode;
 import br.com.codenest.marknow.mapper.UsuarioMapper;
+import br.com.codenest.marknow.repository.PrestadorRepository;
 import br.com.codenest.marknow.repository.UsuarioRepository;
+import br.com.codenest.marknow.util.UtilsString;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -22,10 +25,12 @@ public class UsuarioService {
 
     @Inject
     UsuarioMapper mapper;
+    @Inject
+    PrestadorRepository prestadorRepository;
 
     @Transactional
-    public UsuarioResponse create(UsuarioCreateResquest req) {
-        validacaoCreat(req);
+    public UsuarioResponse create(UsuarioCreateResquest req, String oidPrestador) {
+        validacaoCreat(req, oidPrestador);
         Usuario usuario = mapper.toEntity(req);
         repo.persist(usuario);
         return mapper.toResponse(usuario);
@@ -56,13 +61,23 @@ public class UsuarioService {
     }
 
 
-    private void validacaoCreat(UsuarioCreateResquest req) {
+    private void validacaoCreat(UsuarioCreateResquest req, String oidPrestador) {
         if (req == null) {
             throw BusinessException.of(ErrorCode.INTERNAL_ERROR, "Erro inesperado.");
         }
 
         if (repo.existsByEmail(req.getEmail())) {
             throw BusinessException.of(ErrorCode.CONFLICT, "Já existe usuário cadastrado com este e-mail.");
+        }
+
+        if (!UtilsString.temTexto(oidPrestador)) {
+            throw BusinessException.of(ErrorCode.UNPROCESSABLE, "oidPrestador não informado.");
+        }
+
+        Prestador prestador = prestadorRepository.findById(oidPrestador);
+
+        if (prestador == null) {
+            throw BusinessException.of(ErrorCode.UNPROCESSABLE, "Prestador não encontrado.");
         }
     }
 

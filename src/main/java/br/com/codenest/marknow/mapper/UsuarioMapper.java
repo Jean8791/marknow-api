@@ -14,6 +14,7 @@ public class UsuarioMapper {
         usuario.setEmail(dto.getEmail());
         usuario.setSenha(dto.getSenha());
         usuario.setNome(dto.getNome());
+        usuario.setCriadoPor("SYSTEM");
         return usuario;
     }
 

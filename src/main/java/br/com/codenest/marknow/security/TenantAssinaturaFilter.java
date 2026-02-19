@@ -36,7 +36,7 @@ public class TenantAssinaturaFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext ctx) {
 
         String path = ctx.getUriInfo().getPath();
-        if (path.startsWith("/auth") || path.startsWith("/cadastro")) return;
+        if (path.startsWith("/auth")) return;
 
         String prestadorOid = ctx.getHeaderString("X-Prestador-Oid");
         if (prestadorOid == null || prestadorOid.isBlank()) {
