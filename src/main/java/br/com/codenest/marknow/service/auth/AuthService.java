@@ -71,14 +71,14 @@ public class AuthService {
             }
         }
 
-        return gerarToken(usuario);
+        return gerarToken(usuario.getOid(), usuario.getEmail());
     }
 
     @Transactional
-    public String gerarToken(Usuario usuario) {
+    public String gerarToken(String oid, String email) {
         return Jwt.issuer("marknow")
-                .subject(usuario.getEmail())
-                .claim("usuarioOid", usuario.getOid())
+                .subject(email)
+                .claim("usuarioOid", oid)
                 .expiresIn(Duration.ofHours(6))
                 .sign();
     }

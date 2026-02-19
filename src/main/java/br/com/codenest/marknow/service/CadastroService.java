@@ -2,15 +2,14 @@ package br.com.codenest.marknow.service;
 
 import br.com.codenest.marknow.dto.cadastro.CadastroCreateRequest;
 import br.com.codenest.marknow.dto.cadastro.CadastroResponse;
+import br.com.codenest.marknow.dto.prestador.PrestadorResponse;
+import br.com.codenest.marknow.dto.usuario.UsuarioResponse;
 import br.com.codenest.marknow.entity.Assinatura;
-import br.com.codenest.marknow.entity.Prestador;
 import br.com.codenest.marknow.entity.PrestadorUsuario;
-import br.com.codenest.marknow.entity.Usuario;
 import br.com.codenest.marknow.enums.AssinaturaStatus;
 import br.com.codenest.marknow.enums.PrestadorUsuarioRole;
 import br.com.codenest.marknow.exception.BusinessException;
 import br.com.codenest.marknow.exception.ErrorCode;
-import br.com.codenest.marknow.mapper.PrestadorMapper;
 import br.com.codenest.marknow.mapper.UsuarioMapper;
 import br.com.codenest.marknow.repository.AssinaturaRepository;
 import br.com.codenest.marknow.repository.PrestadorRepository;
@@ -41,7 +40,9 @@ public class CadastroService {
     @Inject
     UsuarioMapper usuarioMapper;
     @Inject
-    PrestadorMapper prestadorMapper;
+    PrestadorService prestadorService;
+    @Inject
+    UsuarioService usuarioService;
 
     @Transactional
     public CadastroResponse create(@Valid CadastroCreateRequest req) {
@@ -59,13 +60,8 @@ public class CadastroService {
             throw BusinessException.of(ErrorCode.CONFLICT, "Já existe usuário cadastrado com este e-mail.");
         }
 
-        Prestador prestador = prestadorMapper.toEntity(req.getPrestador());
-        prestadorRepository.persist(prestador);
-
-        Usuario usuario = usuarioMapper.toEntity(req.getUsuario());
-        usuario.setOidPrestador(prestador.getOid());
-        usuario.setCriadoPor("SYSTEM");
-        usuarioRepository.persist(usuario);
+        PrestadorResponse prestador = prestadorService.create(req.getPrestador());
+        UsuarioResponse usuario = usuarioService.create(req.getUsuario(), prestador.getOid());
 
         PrestadorUsuario pu = new PrestadorUsuario();
         pu.setOidPrestador(prestador.getOid());
@@ -85,7 +81,7 @@ public class CadastroService {
         assinatura.setProvedor("INTERNO");
         assinaturaRepository.persist(assinatura);
 
-        String token = authService.gerarToken(usuario);
+        String token = authService.gerarToken(usuario.getOid(), email);
         return new CadastroResponse(prestador.getOid(), token);
     }
 }
