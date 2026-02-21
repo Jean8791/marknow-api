@@ -24,9 +24,5 @@ public class CadastroCreateRequest {
     private UsuarioCreateResquest usuario;
 
     @NotBlank
-    private String plano;
-
-    @Min(1)
-    @NotNull
-    private Integer diasTrial;
+    private String oidPlano;
 }

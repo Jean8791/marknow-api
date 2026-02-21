@@ -42,3 +42,10 @@ alter table prestador_usuario
 alter table prestador_usuario
     add constraint ck_prestador_usuario_status
         check (status in ('ATIVO', 'BLOQUEADO'));
+
+-- =========================
+-- plano.status (PlanoStatus: ATIVO, INATIVO)
+-- =========================
+alter table plano
+    add constraint ck_plano_usuario_status
+        check (status in ('ATIVO', 'INATIVO'));

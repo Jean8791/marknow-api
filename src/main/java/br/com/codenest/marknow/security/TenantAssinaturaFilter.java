@@ -38,19 +38,22 @@ public class TenantAssinaturaFilter implements ContainerRequestFilter {
         String path = ctx.getUriInfo().getPath();
         if (path.startsWith("/auth")) return;
 
-        String prestadorOid = ctx.getHeaderString("X-Prestador-Oid");
-        if (prestadorOid == null || prestadorOid.isBlank()) {
-            abort(ctx, "Faltou header X-Prestador-Oid");
-            return;
-        }
-
         String usuarioOid = jwtUtil.getUsuarioOidOrNull();
+
         if (usuarioOid == null) {
             abort(ctx, "Token inválido");
             return;
         }
 
+        String prestadorOid = jwtUtil.getPrestadorOidOrNull();
+
+        if (prestadorOid == null) {
+            abort(ctx, "Token inválido");
+            return;
+        }
+
         Usuario u = Usuario.findById(usuarioOid);
+
         if (u == null || !UsuarioStatus.ATIVO.equals(u.getStatus())) {
             abort(ctx, "Usuário bloqueado");
             return;
@@ -78,6 +81,7 @@ public class TenantAssinaturaFilter implements ContainerRequestFilter {
         }
 
         Assinatura a = Assinatura.find("oidPrestador", prestadorOid).firstResult();
+
         if (!politica.isAtiva(a, Instant.now())) {
             abort(ctx, "Assinatura inválida");
             return;

@@ -11,6 +11,7 @@ import br.com.codenest.marknow.repository.PrestadorRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class PrestadorService {
     PrestadorMapper mapper;
 
     @Transactional
-    public PrestadorResponse create(PrestadorCreateRequest req) {
+    public PrestadorResponse create(@Valid PrestadorCreateRequest req) {
         validacaoCreat(req);
         Prestador prestador = mapper.toEntity(req);
         repo.persist(prestador);
@@ -33,7 +34,7 @@ public class PrestadorService {
     }
 
     @Transactional
-    public PrestadorResponse update(String oid, PrestadorUpdateRequest req) {
+    public PrestadorResponse update(String oid, @Valid PrestadorUpdateRequest req) {
         Prestador prestador = repo.findById(req.getOid());
         validacaoUpdate(prestador, req);
         mapper.toUpdateEntity(prestador, req);

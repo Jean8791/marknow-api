@@ -33,6 +33,7 @@ public class AuthService {
     public String validarAcesso(LoginRequest req) {
 
         Usuario usuario = usuarioRepository.findByEmail(req.email.toLowerCase());
+
         if (usuario == null) {
             throw BusinessException.of(ErrorCode.UNAUTHORIZED, "Credenciais inválidas.");
         }
@@ -49,36 +50,40 @@ public class AuthService {
 
         if (!superAdmin) {
 
-            Prestador prestador = Prestador.findById(req.prestadorOid);
+            Prestador prestador = Prestador.findById(usuario.getOidPrestador());
+
             if (prestador == null) {
                 throw BusinessException.of(ErrorCode.FORBIDDEN, "Prestador inválido.");
             }
+
             if (prestador.getStatus() != PrestadorStatus.ATIVO) {
                 throw BusinessException.of(ErrorCode.FORBIDDEN, "Prestador inválido.");
             }
 
             PrestadorUsuario pu = PrestadorUsuario
-                    .find("oidPrestador=?1 and oidUsuario=?2", req.prestadorOid, usuario.getOid())
+                    .find("oidPrestador=?1 and oidUsuario=?2", prestador.getOid(), usuario.getOid())
                     .firstResult();
 
             if (pu == null || pu.getStatus() != PrestadorUsuarioStatus.ATIVO) {
                 throw BusinessException.of(ErrorCode.FORBIDDEN, "Sem acesso a este prestador.");
             }
 
-            Assinatura assinatura = Assinatura.find("oidPrestador", req.prestadorOid).firstResult();
+            Assinatura assinatura = Assinatura.find("oidPrestador", prestador.getOid()).firstResult();
+
             if (!politica.isAtiva(assinatura, Instant.now())) {
                 throw BusinessException.of(ErrorCode.FORBIDDEN, "Assinatura inválida.");
             }
         }
 
-        return gerarToken(usuario.getOid(), usuario.getEmail());
+        return gerarToken(usuario.getOidPrestador(), usuario.getOid(), usuario.getEmail());
     }
 
     @Transactional
-    public String gerarToken(String oid, String email) {
+    public String gerarToken(String prestadorOid, String usuarioOid, String email) {
         return Jwt.issuer("marknow")
                 .subject(email)
-                .claim("usuarioOid", oid)
+                .claim("prestadorOid", prestadorOid)
+                .claim("usuarioOid", usuarioOid)
                 .expiresIn(Duration.ofHours(6))
                 .sign();
     }

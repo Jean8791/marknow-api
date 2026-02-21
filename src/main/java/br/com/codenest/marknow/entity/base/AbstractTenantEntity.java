@@ -1,7 +1,6 @@
 package br.com.codenest.marknow.entity.base;
 
-import br.com.codenest.marknow.exception.BusinessException;
-import br.com.codenest.marknow.exception.ErrorCode;
+import br.com.codenest.marknow.service.auditoria.AuditoriaService;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
@@ -25,9 +24,15 @@ public abstract class AbstractTenantEntity extends AbstractEntity {
     private String atualizadoPor;
 
     @PrePersist
-    void validateTenant() {
-        if (oidPrestador == null || oidPrestador.isBlank()) {
-            throw new IllegalStateException("oidPrestador é obrigatório.");
+    void preencherAuditoria() {
+        AuditoriaService auditoria = io.quarkus.arc.Arc.container().instance(AuditoriaService.class).get();
+
+        if (this.oidPrestador == null) {
+            this.oidPrestador = auditoria.oidPrestadorLogadoOrThrow();
+        }
+
+        if (this.criadoPor == null) {
+            this.criadoPor = auditoria.oidUsuarioLogadoOrThrow();
         }
     }
 }

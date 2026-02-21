@@ -14,6 +14,7 @@ import br.com.codenest.marknow.util.UtilsString;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class UsuarioService {
     PrestadorRepository prestadorRepository;
 
     @Transactional
-    public UsuarioResponse create(UsuarioCreateResquest req, String oidPrestador) {
+    public UsuarioResponse create(@Valid UsuarioCreateResquest req, String oidPrestador) {
         validacaoCreat(req, oidPrestador);
         Usuario usuario = mapper.toEntity(req);
         repo.persist(usuario);
@@ -37,7 +38,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public UsuarioResponse update(String oid, UsuarioUpdateResquest req) {
+    public UsuarioResponse update(String oid, @Valid UsuarioUpdateResquest req) {
         Usuario usuario = repo.findById(oid);
         validacaoUpdate(usuario, req);
         mapper.toUpdateEntity(usuario, req);
