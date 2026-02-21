@@ -19,6 +19,11 @@ public class JwtUtil {
         return v == null ? null : String.valueOf(v);
     }
 
+    public String getPrestadorOidOrNull() {
+        Object v = jwt.getClaim("prestadorOid");
+        return v == null ? null : String.valueOf(v);
+    }
+
     public String getUsuarioOidOrThrow() {
         String oid = getUsuarioOidOrNull();
         if (oid == null || oid.isBlank()) {
@@ -26,4 +31,13 @@ public class JwtUtil {
         }
         return oid;
     }
+
+    public String getPrestadorOidOrThrow() {
+        String oid = getPrestadorOidOrNull();
+        if (oid == null || oid.isBlank()) {
+            throw new IllegalStateException("Token sem claim prestadorOid");
+        }
+        return oid;
+    }
+
 }

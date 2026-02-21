@@ -16,8 +16,12 @@ import java.time.Instant;
 @Table(name = "assinatura")
 public class Assinatura extends AbstractTenantEntity {
 
-    @Column(nullable = false, length = 30)
-    private String plano;
+    @Column(name = "oid_plano", nullable = false, length = 36)
+    private String oidPlano;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "oid_plano", insertable = false, updatable = false, nullable = false)
+    private Plano plano;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -39,6 +43,9 @@ public class Assinatura extends AbstractTenantEntity {
     public void beforePersist() {
         if (this.status == null) {
             this.status = AssinaturaStatus.TRIAL;
+        }
+        if (this.plano != null) {
+            this.oidPlano = plano.getOid();
         }
     }
 }
