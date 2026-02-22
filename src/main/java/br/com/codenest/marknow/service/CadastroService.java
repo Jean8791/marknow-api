@@ -60,7 +60,7 @@ public class CadastroService {
         }
 
         PrestadorResponse prestador = prestadorService.create(req.getPrestador());
-        UsuarioResponse usuario = usuarioService.create(req.getUsuario(), prestador.getOid());
+        UsuarioResponse usuario = usuarioService.create(req.getUsuario());
 
         Plano plano = planoRepository.findByOid(req.getOidPlano());
 

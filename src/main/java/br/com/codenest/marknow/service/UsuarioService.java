@@ -26,20 +26,18 @@ public class UsuarioService {
 
     @Inject
     UsuarioMapper mapper;
-    @Inject
-    PrestadorRepository prestadorRepository;
 
     @Transactional
-    public UsuarioResponse create(@Valid UsuarioCreateResquest req, String oidPrestador) {
-        validacaoCreat(req, oidPrestador);
+    public UsuarioResponse create(@Valid UsuarioCreateResquest req) {
+        validacaoCreat(req);
         Usuario usuario = mapper.toEntity(req);
         repo.persist(usuario);
         return mapper.toResponse(usuario);
     }
 
     @Transactional
-    public UsuarioResponse update(String oid, @Valid UsuarioUpdateResquest req) {
-        Usuario usuario = repo.findById(oid);
+    public UsuarioResponse update(@Valid UsuarioUpdateResquest req) {
+        Usuario usuario = repo.findById(req.getOid());
         validacaoUpdate(usuario, req);
         mapper.toUpdateEntity(usuario, req);
         return mapper.toResponse(usuario);
@@ -62,23 +60,13 @@ public class UsuarioService {
     }
 
 
-    private void validacaoCreat(UsuarioCreateResquest req, String oidPrestador) {
+    private void validacaoCreat(UsuarioCreateResquest req) {
         if (req == null) {
             throw BusinessException.of(ErrorCode.INTERNAL_ERROR, "Erro inesperado.");
         }
 
         if (repo.existsByEmail(req.getEmail())) {
             throw BusinessException.of(ErrorCode.CONFLICT, "Já existe usuário cadastrado com este e-mail.");
-        }
-
-        if (!UtilsString.temTexto(oidPrestador)) {
-            throw BusinessException.of(ErrorCode.UNPROCESSABLE, "oidPrestador não informado.");
-        }
-
-        Prestador prestador = prestadorRepository.findById(oidPrestador);
-
-        if (prestador == null) {
-            throw BusinessException.of(ErrorCode.UNPROCESSABLE, "Prestador não encontrado.");
         }
     }
 
