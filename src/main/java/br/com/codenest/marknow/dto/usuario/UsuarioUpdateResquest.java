@@ -18,6 +18,9 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 public class UsuarioUpdateResquest {
 
     @NotBlank
+    public String oid;
+
+    @NotBlank
     @EmailStrict
     @Schema(required = true, example = "admin@prestador.com")
     public String email;

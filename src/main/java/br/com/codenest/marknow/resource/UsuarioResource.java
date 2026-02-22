@@ -30,11 +30,10 @@ public class UsuarioResource {
     UsuarioService usuarioService;
 
     @POST
-    @Path("/{oidPrestador}")
     @Operation(summary = "Criar usuário")
     @APIResponse(responseCode = "201", description = "Criado", content = @Content(schema = @Schema(implementation = UsuarioResponse.class)))
-    public Response create(@Valid UsuarioCreateResquest req, @Context UriInfo uriInfo, @PathParam("oidPrestador") String oidPrestador) {
-        UsuarioResponse created = usuarioService.create(req, oidPrestador);
+    public Response create(@Valid UsuarioCreateResquest req, @Context UriInfo uriInfo) {
+        UsuarioResponse created = usuarioService.create(req);
         URI location = uriInfo.getAbsolutePathBuilder().path(created.oid).build();
         return Response.created(location).entity(created).build();
     }
@@ -56,10 +55,9 @@ public class UsuarioResource {
     }
 
     @PUT
-    @Path("/{oid}")
     @Operation(summary = "Atualizar usuário")
-    public UsuarioResponse update(@PathParam("oid") String oid, @Valid UsuarioUpdateResquest req) {
-        return usuarioService.update(oid, req);
+    public UsuarioResponse update(@Valid UsuarioUpdateResquest req) {
+        return usuarioService.update(req);
     }
 
     @DELETE

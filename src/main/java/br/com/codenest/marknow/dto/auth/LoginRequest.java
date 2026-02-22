@@ -9,7 +9,4 @@ public class LoginRequest {
 
     @NotBlank
     public String senha;
-
-    @NotBlank
-    public String prestadorOid;
 }

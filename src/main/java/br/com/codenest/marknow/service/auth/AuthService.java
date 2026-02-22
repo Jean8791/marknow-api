@@ -10,8 +10,10 @@ import br.com.codenest.marknow.enums.PrestadorUsuarioStatus;
 import br.com.codenest.marknow.enums.UsuarioStatus;
 import br.com.codenest.marknow.exception.BusinessException;
 import br.com.codenest.marknow.exception.ErrorCode;
+import br.com.codenest.marknow.repository.PrestadorUsuarioRepository;
 import br.com.codenest.marknow.repository.UsuarioRepository;
 import br.com.codenest.marknow.service.assinatura.AssinaturaPolitica;
+import br.com.codenest.marknow.util.UtilsSenha;
 import io.smallrye.jwt.build.Jwt;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -29,10 +31,12 @@ public class AuthService {
     @Inject
     UsuarioRepository usuarioRepository;
 
+    @Inject
+    PrestadorUsuarioRepository prestadorUsuarioRepository;
+
     @Transactional
     public String validarAcesso(LoginRequest req) {
-
-        Usuario usuario = usuarioRepository.findByEmail(req.email.toLowerCase());
+        Usuario usuario = usuarioRepository.find("email", req.email.toLowerCase()).firstResult();
 
         if (usuario == null) {
             throw BusinessException.of(ErrorCode.UNAUTHORIZED, "Credenciais inválidas.");
@@ -42,50 +46,49 @@ public class AuthService {
             throw BusinessException.of(ErrorCode.FORBIDDEN, "Usuário bloqueado.");
         }
 
-        if (!usuario.getSenha().equals(req.senha)) {
+        if (!UtilsSenha.verificar(req.senha, usuario.getSenha())) {
             throw BusinessException.of(ErrorCode.UNAUTHORIZED, "Credenciais inválidas.");
         }
 
+        String oidPrestadorParaToken = null;
         boolean superAdmin = Boolean.TRUE.equals(usuario.getAdmin());
 
         if (!superAdmin) {
+            PrestadorUsuario pu = prestadorUsuarioRepository.find("oidUsuario=?1 and status=?2",
+                    usuario.getOid(), PrestadorUsuarioStatus.ATIVO).firstResult();
 
-            Prestador prestador = Prestador.findById(usuario.getOidPrestador());
-
-            if (prestador == null) {
-                throw BusinessException.of(ErrorCode.FORBIDDEN, "Prestador inválido.");
+            if (pu == null) {
+                throw BusinessException.of(ErrorCode.FORBIDDEN, "Usuário não vinculado a nenhum prestador ativo.");
             }
 
-            if (prestador.getStatus() != PrestadorStatus.ATIVO) {
-                throw BusinessException.of(ErrorCode.FORBIDDEN, "Prestador inválido.");
-            }
-
-            PrestadorUsuario pu = PrestadorUsuario
-                    .find("oidPrestador=?1 and oidUsuario=?2", prestador.getOid(), usuario.getOid())
-                    .firstResult();
-
-            if (pu == null || pu.getStatus() != PrestadorUsuarioStatus.ATIVO) {
-                throw BusinessException.of(ErrorCode.FORBIDDEN, "Sem acesso a este prestador.");
+            Prestador prestador = Prestador.findById(pu.getOidPrestador());
+            if (prestador == null || prestador.getStatus() != PrestadorStatus.ATIVO) {
+                throw BusinessException.of(ErrorCode.FORBIDDEN, "Prestador inválido ou bloqueado.");
             }
 
             Assinatura assinatura = Assinatura.find("oidPrestador", prestador.getOid()).firstResult();
-
             if (!politica.isAtiva(assinatura, Instant.now())) {
-                throw BusinessException.of(ErrorCode.FORBIDDEN, "Assinatura inválida.");
+                throw BusinessException.of(ErrorCode.FORBIDDEN, "Acesso bloqueado: Verifique a assinatura do plano.");
             }
+
+            oidPrestadorParaToken = prestador.getOid();
         }
 
-        return gerarToken(usuario.getOidPrestador(), usuario.getOid(), usuario.getEmail());
+        return gerarToken(oidPrestadorParaToken, usuario.getOid(), usuario.getEmail());
     }
 
-    @Transactional
     public String gerarToken(String prestadorOid, String usuarioOid, String email) {
-        return Jwt.issuer("marknow")
+        var claims = Jwt.issuer("marknow")
                 .subject(email)
-                .claim("prestadorOid", prestadorOid)
-                .claim("usuarioOid", usuarioOid)
-                .expiresIn(Duration.ofHours(6))
-                .sign();
+                .claim("usuarioOid", usuarioOid);
+
+        if (prestadorOid != null) {
+            claims.claim("prestadorOid", prestadorOid);
+        } else {
+            claims.claim("superAdmin", true);
+        }
+
+        return claims.expiresIn(Duration.ofHours(6)).sign();
     }
 
 }

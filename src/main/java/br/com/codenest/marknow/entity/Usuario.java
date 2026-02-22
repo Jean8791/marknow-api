@@ -1,5 +1,6 @@
 package br.com.codenest.marknow.entity;
 
+import br.com.codenest.marknow.entity.base.AbstractEntity;
 import br.com.codenest.marknow.entity.base.AbstractTenantEntity;
 import br.com.codenest.marknow.enums.UsuarioStatus;
 import jakarta.persistence.*;
@@ -11,8 +12,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "usuario", uniqueConstraints = @UniqueConstraint(name = "uk_usuario_prestador_email", columnNames = {"oid_prestador", "email"}))
-public class Usuario extends AbstractTenantEntity {
+@Table(name = "usuario", uniqueConstraints = @UniqueConstraint(name = "uk_usuario_email", columnNames = {"email"}))
+public class Usuario extends AbstractEntity {
 
     @Column(name = "email", nullable = false, length = 100)
     private String email;

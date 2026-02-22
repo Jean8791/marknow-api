@@ -36,60 +36,62 @@ public class TenantAssinaturaFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext ctx) {
 
         String path = ctx.getUriInfo().getPath();
-        if (path.startsWith("/auth")) return;
+
+        if (path.startsWith("/auth") || path.startsWith("/public")) return;
 
         String usuarioOid = jwtUtil.getUsuarioOidOrNull();
-
         if (usuarioOid == null) {
-            abort(ctx, "Token inválido");
-            return;
-        }
-
-        String prestadorOid = jwtUtil.getPrestadorOidOrNull();
-
-        if (prestadorOid == null) {
-            abort(ctx, "Token inválido");
+            abort(ctx, "Token inválido: Usuário não identificado");
             return;
         }
 
         Usuario u = Usuario.findById(usuarioOid);
-
         if (u == null || !UsuarioStatus.ATIVO.equals(u.getStatus())) {
-            abort(ctx, "Usuário bloqueado");
+            abort(ctx, "Acesso negado: Usuário inexistente ou bloqueado");
             return;
         }
 
         tenantContext.usuario = u;
-        tenantContext.prestadorOid = prestadorOid;
-        tenantContext.superAdmin = u.getAdmin() != null ? u.getAdmin() : false;
+        tenantContext.superAdmin = Boolean.TRUE.equals(u.getAdmin());
 
-        if (tenantContext.superAdmin) return;
+        if (tenantContext.superAdmin) {
+            return;
+        }
+
+        String prestadorOid = jwtUtil.getPrestadorOidOrNull();
+        if (prestadorOid == null) {
+            abort(ctx, "Token inválido: Prestador não identificado");
+            return;
+        }
 
         Prestador p = Prestador.findById(prestadorOid);
         if (p == null || !PrestadorStatus.ATIVO.equals(p.getStatus())) {
-            abort(ctx, "Prestador bloqueado");
+            abort(ctx, "Acesso negado: Prestador bloqueado ou inválido");
             return;
         }
+
+        tenantContext.prestadorOid = prestadorOid;
 
         PrestadorUsuario pu = PrestadorUsuario
                 .find("oidPrestador=?1 and oidUsuario=?2", prestadorOid, usuarioOid)
                 .firstResult();
 
         if (pu == null || pu.getStatus() != PrestadorUsuarioStatus.ATIVO) {
-            abort(ctx, "Sem acesso ao prestador");
+            abort(ctx, "Acesso negado: Você não tem permissão para acessar este prestador");
             return;
         }
 
         Assinatura a = Assinatura.find("oidPrestador", prestadorOid).firstResult();
-
         if (!politica.isAtiva(a, Instant.now())) {
-            abort(ctx, "Assinatura inválida");
+            abort(ctx, "Acesso negado: Assinatura do plano expirada ou inválida");
             return;
         }
     }
 
     private void abort(ContainerRequestContext ctx, String msg) {
-        ctx.abortWith(Response.status(Response.Status.FORBIDDEN).entity(new Error(msg)).build());
+        ctx.abortWith(Response.status(Response.Status.FORBIDDEN)
+                .entity(new Error(msg))
+                .build());
     }
 
     public record Error(String message) {
