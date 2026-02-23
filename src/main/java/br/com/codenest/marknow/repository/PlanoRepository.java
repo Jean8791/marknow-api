@@ -16,25 +16,8 @@ public class PlanoRepository implements PanacheRepositoryBase<Plano, String> {
     }
 
     public List<Plano> findAll(int page, int size, String sort) {
-        Sort panacheSort = parseSort(sort);
+        Sort panacheSort = Sort.by(sort);
         return findAll(panacheSort).page(page, size).list();
     }
 
-
-    private Sort parseSort(String sort) {
-        Sort s = Sort.by("createdAt").descending();
-
-        if (sort == null || sort.trim().isEmpty()) return s;
-
-        String[] parts = sort.split(",", 2);
-        String field = parts[0].trim();
-        String direction = (parts.length > 1 ? parts[1].trim() : "asc");
-
-        if (!field.equals("nome") && !field.equals("createdAt") && !field.equals("updatedAt") && !field.equals("status")) {
-            return s;
-        }
-
-        s = Sort.by(field);
-        return "desc".equalsIgnoreCase(direction) ? s.descending() : s.ascending();
-    }
 }

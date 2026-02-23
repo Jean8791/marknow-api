@@ -2,14 +2,10 @@ package br.com.codenest.marknow.resource;
 
 import br.com.codenest.marknow.dto.plano.PlanoCreateRequest;
 import br.com.codenest.marknow.dto.plano.PlanoResponse;
-import br.com.codenest.marknow.dto.prestador.PrestadorCreateRequest;
 import br.com.codenest.marknow.service.PlanoService;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -21,6 +17,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import java.net.URI;
+import java.util.List;
 
 @Path("/plano")
 @Tag(name = "Plano")
@@ -38,5 +35,21 @@ public class PlanoResource {
         PlanoResponse created = planoService.create(req);
         URI location = uriInfo.getAbsolutePathBuilder().path(created.getOid()).build();
         return Response.created(location).entity(created).build();
+    }
+
+    @GET
+    @Path("/{oid}")
+    @Operation(summary = "Buscar prestador por OID")
+    @APIResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = PlanoResponse.class)))
+    public PlanoResponse get(@PathParam("oid") String oid) {
+        return planoService.get(oid);
+    }
+
+    @GET
+    @Operation(summary = "Listar prestadores (paginado)")
+    public List<PlanoResponse> list(@QueryParam("page") @DefaultValue("0") int page,
+                                    @QueryParam("size") @DefaultValue("20") int size,
+                                    @QueryParam("sort") @DefaultValue("criadoEm") String sort) {
+        return planoService.list(page, size, sort);
     }
 }

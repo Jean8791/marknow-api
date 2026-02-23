@@ -21,7 +21,7 @@ create table assinatura
     criado_por          varchar(36) not null,
     atualizado_por      varchar(36) null,
 
-    oid_plano           varchar(30) null,
+    oid_plano           varchar(36) null,
     status              varchar(20) not null,
     fim_periodo_atual   timestamptz not null,
     tolerancia_ate      timestamptz null,
