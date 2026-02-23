@@ -26,6 +26,7 @@ public class PlanoService {
 
     @Transactional
     public PlanoResponse create(@Valid PlanoCreateRequest req) {
+        validarCreate(req);
         Plano plano = mapper.toEntity(req);
         planoRepository.persist(plano);
         return mapper.toResponse(plano);
@@ -53,6 +54,12 @@ public class PlanoService {
     public void delete(String oid) {
         boolean deletado = planoRepository.deleteById(oid);
         if (!deletado) throw BusinessException.of(ErrorCode.NOT_FOUND, "Plano não encontrado.");
+    }
+
+    private void validarCreate(PlanoCreateRequest req) {
+        if (req == null) {
+            throw BusinessException.of(ErrorCode.INTERNAL_ERROR, "Erro inesperado.");
+        }
     }
 
     private void validarUpdate(Plano plano, PlanoUpdateRequest req) {

@@ -13,7 +13,7 @@ import br.com.codenest.marknow.enums.PrestadorUsuarioRole;
 import br.com.codenest.marknow.exception.BusinessException;
 import br.com.codenest.marknow.exception.ErrorCode;
 import br.com.codenest.marknow.repository.*;
-import br.com.codenest.marknow.service.auth.AuthService;
+import br.com.codenest.marknow.service.auth.JwtUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -26,7 +26,7 @@ import java.time.temporal.ChronoUnit;
 public class CadastroService {
 
     @Inject
-    AuthService authService;
+    JwtUtil jwtUtil;
 
     @Inject
     UsuarioRepository usuarioRepository;
@@ -117,7 +117,7 @@ public class CadastroService {
         convite.setQtdUsado(convite.getQtdUsado() + 1);
         conviteRepository.persist(convite);
 
-        String token = authService.gerarToken(prestador.getOid(), usuario.getOid(), email);
+        String token = jwtUtil.gerarToken(prestador.getOid(), usuario.getOid(), email, pu.getRole());
 
         return new CadastroResponse(prestador.getOid(), token);
     }

@@ -6,4 +6,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class AssinaturaRepository implements PanacheRepositoryBase<Assinatura, String> {
+
+    public Assinatura findByOidPrestador(String prestadorOid) {
+        return find("oidPrestador", prestadorOid).firstResult();
+    }
 }

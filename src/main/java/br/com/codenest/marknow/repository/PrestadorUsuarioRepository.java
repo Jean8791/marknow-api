@@ -6,4 +6,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class PrestadorUsuarioRepository implements PanacheRepositoryBase<PrestadorUsuario, String> {
+    public PrestadorUsuario findByOidPrestadorAndOidUsuario(String prestadorOid, String usuarioOid) {
+        return find("oidPrestador=?1 and oidUsuario=?2", prestadorOid, usuarioOid)
+                .firstResult();
+    }
 }

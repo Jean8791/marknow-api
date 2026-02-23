@@ -1,8 +1,10 @@
 package br.com.codenest.marknow.dto.convite;
 
+import br.com.codenest.marknow.util.UtilsData;
 import br.com.codenest.marknow.util.UtilsString;
 import br.com.codenest.marknow.util.UtilsValor;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -16,20 +18,21 @@ import java.time.Instant;
 @NoArgsConstructor
 public class ConviteCreateRequest {
 
-    @NotBlank(message = "Informme o código")
-    private String codigo;
+    @NotBlank(message = "Informme a descrição")
+    private String descricao;
 
     private String emailDestinatario;
 
     @NotNull(message = "Informe a data de expiração")
+    @Future(message = "A data de expiração deve ser no futuro")
     private Instant expiraEm;
 
     @NotNull(message = "Informe o maximo de uso")
     private Integer maxUsos;
 
-    @JsonSetter("codigo")
-    public void setCodigo(String codigo) {
-        this.codigo = UtilsString.apararParaNull(codigo);
+    @JsonSetter("descricao")
+    public void setDescricao(String descricao) {
+        this.descricao = UtilsString.apararParaNull(descricao);
     }
 
     @JsonSetter("maxUsos")

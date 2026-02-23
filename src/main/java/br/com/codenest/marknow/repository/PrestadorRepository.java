@@ -12,7 +12,7 @@ import java.util.List;
 public class PrestadorRepository implements PanacheRepositoryBase<Prestador, String> {
 
     public List<Prestador> findAll(int page, int size, String sort) {
-        Sort panacheSort = parseSort(sort);
+        Sort panacheSort = Sort.by(sort);
         return findAll(panacheSort).page(page, size).list();
     }
 
@@ -25,22 +25,5 @@ public class PrestadorRepository implements PanacheRepositoryBase<Prestador, Str
         if (novo == null) return false;
 
         return count("documento = ?1 and oid <> ?2", novo, oidPrestador) > 0;
-    }
-
-    private Sort parseSort(String sort) {
-        Sort s = Sort.by("createdAt").descending();
-
-        if (sort == null || sort.trim().isEmpty()) return s;
-
-        String[] parts = sort.split(",", 2);
-        String field = parts[0].trim();
-        String direction = (parts.length > 1 ? parts[1].trim() : "asc");
-
-        if (!field.equals("nome") && !field.equals("createdAt") && !field.equals("updatedAt") && !field.equals("status")) {
-            return s;
-        }
-
-        s = Sort.by(field);
-        return "desc".equalsIgnoreCase(direction) ? s.descending() : s.ascending();
     }
 }

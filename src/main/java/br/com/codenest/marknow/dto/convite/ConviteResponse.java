@@ -12,6 +12,7 @@ import java.time.Instant;
 public class ConviteResponse {
     private String oid;
     private String codigo;
+    private String descricao;
     private String emailDestinatario;
     private Instant expiraEm;
     private Instant utilizadoEm;

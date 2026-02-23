@@ -9,8 +9,12 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
+
+import java.net.URI;
 
 @Path("/auth")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -22,7 +26,9 @@ public class AuthResource {
 
     @POST
     @Path("/login")
-    public Response login(@Valid LoginRequest req) {
-        return Response.ok(new LoginResponse(authService.validarAcesso(req))).build();
+    public Response login(@Valid LoginRequest req, @Context UriInfo uriInfo) {
+        LoginResponse loginResponse = authService.validarAcesso(req);
+        URI location = uriInfo.getAbsolutePathBuilder().path(loginResponse.getNome()).build();
+        return Response.ok(location).entity(loginResponse).build();
     }
 }

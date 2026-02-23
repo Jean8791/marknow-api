@@ -3,6 +3,7 @@ package br.com.codenest.marknow.resource;
 import br.com.codenest.marknow.dto.convite.ConviteCreateRequest;
 import br.com.codenest.marknow.dto.convite.ConviteResponse;
 import br.com.codenest.marknow.service.ConviteService;
+import br.com.codenest.marknow.service.auditoria.AuditoriaService;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -28,12 +29,16 @@ import java.net.URI;
 public class ConviteResource {
 
     @Inject
+    AuditoriaService auditoriaService;
+
+    @Inject
     ConviteService cadastroService;
 
     @POST
     @Operation(summary = "Cadastro")
     @APIResponse(responseCode = "201", description = "Criado com sucesso.", content = @Content(schema = @Schema(implementation = ConviteCreateRequest.class)))
     public Response create(@Valid ConviteCreateRequest req, @Context UriInfo uriInfo) {
+        auditoriaService.checkSuperAdmin();
         ConviteResponse created = cadastroService.create(req);
         URI location = uriInfo.getAbsolutePathBuilder().path(created.getOid()).build();
         return Response.created(location).entity(created).build();

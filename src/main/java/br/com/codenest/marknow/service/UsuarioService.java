@@ -3,13 +3,12 @@ package br.com.codenest.marknow.service;
 import br.com.codenest.marknow.dto.usuario.UsuarioCreateResquest;
 import br.com.codenest.marknow.dto.usuario.UsuarioResponse;
 import br.com.codenest.marknow.dto.usuario.UsuarioUpdateResquest;
-import br.com.codenest.marknow.entity.Prestador;
 import br.com.codenest.marknow.entity.Usuario;
 import br.com.codenest.marknow.exception.BusinessException;
 import br.com.codenest.marknow.exception.ErrorCode;
 import br.com.codenest.marknow.mapper.UsuarioMapper;
-import br.com.codenest.marknow.repository.PrestadorRepository;
 import br.com.codenest.marknow.repository.UsuarioRepository;
+import br.com.codenest.marknow.util.UtilsSenha;
 import br.com.codenest.marknow.util.UtilsString;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -67,6 +66,12 @@ public class UsuarioService {
 
         if (repo.existsByEmail(req.getEmail())) {
             throw BusinessException.of(ErrorCode.CONFLICT, "Já existe usuário cadastrado com este e-mail.");
+        }
+
+        if (UtilsString.temTexto(req.getSenha())) {
+            req.setSenha(UtilsSenha.criptografar(req.getSenha()));
+        } else {
+            throw BusinessException.of(ErrorCode.BAD_REQUEST, "A senha é obrigatória para novos usuários.");
         }
     }
 

@@ -4,6 +4,7 @@ create table convite
     criado_em          timestamptz not null,
     atualizado_em      timestamptz null,
     codigo             varchar(20) not null unique,
+    descricao          varchar(255),
     email_destinatario varchar(120),
     expira_em          timestamptz not null,
     utilizado_em       timestamptz,

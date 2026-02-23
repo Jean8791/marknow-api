@@ -3,6 +3,7 @@ package br.com.codenest.marknow.resource;
 import br.com.codenest.marknow.dto.plano.PlanoCreateRequest;
 import br.com.codenest.marknow.dto.plano.PlanoResponse;
 import br.com.codenest.marknow.service.PlanoService;
+import br.com.codenest.marknow.service.auditoria.AuditoriaService;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -26,12 +27,16 @@ import java.util.List;
 public class PlanoResource {
 
     @Inject
+    AuditoriaService auditoriaService;
+
+    @Inject
     PlanoService planoService;
 
     @POST
     @Operation(summary = "Criar plano")
     @APIResponse(responseCode = "201", description = "Criada", content = @Content(schema = @Schema(implementation = PlanoResponse.class)))
     public Response create(@Valid PlanoCreateRequest req, @Context UriInfo uriInfo) {
+        auditoriaService.checkSuperAdmin();
         PlanoResponse created = planoService.create(req);
         URI location = uriInfo.getAbsolutePathBuilder().path(created.getOid()).build();
         return Response.created(location).entity(created).build();
@@ -42,6 +47,7 @@ public class PlanoResource {
     @Operation(summary = "Buscar prestador por OID")
     @APIResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = PlanoResponse.class)))
     public PlanoResponse get(@PathParam("oid") String oid) {
+        auditoriaService.checkSuperAdmin();
         return planoService.get(oid);
     }
 
@@ -50,6 +56,7 @@ public class PlanoResource {
     public List<PlanoResponse> list(@QueryParam("page") @DefaultValue("0") int page,
                                     @QueryParam("size") @DefaultValue("20") int size,
                                     @QueryParam("sort") @DefaultValue("criadoEm") String sort) {
+        auditoriaService.checkSuperAdmin();
         return planoService.list(page, size, sort);
     }
 }

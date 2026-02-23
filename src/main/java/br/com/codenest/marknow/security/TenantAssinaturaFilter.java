@@ -5,12 +5,16 @@ import br.com.codenest.marknow.entity.Prestador;
 import br.com.codenest.marknow.entity.PrestadorUsuario;
 import br.com.codenest.marknow.entity.Usuario;
 import br.com.codenest.marknow.enums.PrestadorStatus;
+import br.com.codenest.marknow.enums.PrestadorUsuarioRole;
 import br.com.codenest.marknow.enums.PrestadorUsuarioStatus;
 import br.com.codenest.marknow.enums.UsuarioStatus;
+import br.com.codenest.marknow.repository.AssinaturaRepository;
+import br.com.codenest.marknow.repository.PrestadorUsuarioRepository;
 import br.com.codenest.marknow.service.assinatura.AssinaturaPolitica;
 import br.com.codenest.marknow.service.auth.JwtUtil;
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -26,11 +30,22 @@ import java.time.Instant;
 public class TenantAssinaturaFilter implements ContainerRequestFilter {
 
     @Inject
-    TenantContext tenantContext;
-    @Inject
     JwtUtil jwtUtil;
+
+    @Inject
+    EntityManager em;
+
+    @Inject
+    TenantContext tenantContext;
+
     @Inject
     AssinaturaPolitica politica;
+
+    @Inject
+    AssinaturaRepository assinaturaRepository;
+
+    @Inject
+    PrestadorUsuarioRepository prestadorUsuarioRepository;
 
     @Override
     public void filter(ContainerRequestContext ctx) {
@@ -72,16 +87,23 @@ public class TenantAssinaturaFilter implements ContainerRequestFilter {
 
         tenantContext.prestadorOid = prestadorOid;
 
-        PrestadorUsuario pu = PrestadorUsuario
-                .find("oidPrestador=?1 and oidUsuario=?2", prestadorOid, usuarioOid)
-                .firstResult();
+        org.hibernate.Session session = em.unwrap(org.hibernate.Session.class);
+        session.enableFilter("tenantFilter")
+                .setParameter("oidPrestador", tenantContext.prestadorOid);
+
+        PrestadorUsuario pu = prestadorUsuarioRepository.findByOidPrestadorAndOidUsuario(prestadorOid, usuarioOid);
 
         if (pu == null || pu.getStatus() != PrestadorUsuarioStatus.ATIVO) {
             abort(ctx, "Acesso negado: Você não tem permissão para acessar este prestador");
             return;
         }
 
-        Assinatura a = Assinatura.find("oidPrestador", prestadorOid).firstResult();
+        String roleToken = jwtUtil.getRoleOrNull();
+        if (roleToken != null) {
+            tenantContext.rolePrestador = PrestadorUsuarioRole.valueOf(roleToken);
+        }
+
+        Assinatura a = assinaturaRepository.findByOidPrestador(prestadorOid);
         if (!politica.isAtiva(a, Instant.now())) {
             abort(ctx, "Acesso negado: Assinatura do plano expirada ou inválida");
             return;

@@ -4,6 +4,7 @@ import br.com.codenest.marknow.dto.prestador.PrestadorCreateRequest;
 import br.com.codenest.marknow.dto.prestador.PrestadorResponse;
 import br.com.codenest.marknow.dto.prestador.PrestadorUpdateRequest;
 import br.com.codenest.marknow.service.PrestadorService;
+import br.com.codenest.marknow.service.auditoria.AuditoriaService;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -27,12 +28,16 @@ import java.util.List;
 public class PrestadorResource {
 
     @Inject
+    AuditoriaService auditoriaService;
+
+    @Inject
     PrestadorService prestadorService;
 
     @POST
     @Operation(summary = "Criar prestador")
     @APIResponse(responseCode = "201", description = "Criada", content = @Content(schema = @Schema(implementation = PrestadorResponse.class)))
     public Response create(@Valid PrestadorCreateRequest req, @Context UriInfo uriInfo) {
+        auditoriaService.checkRoleAdminPrestador();
         PrestadorResponse created = prestadorService.create(req);
         URI location = uriInfo.getAbsolutePathBuilder().path(created.getOid()).build();
         return Response.created(location).entity(created).build();
@@ -43,6 +48,7 @@ public class PrestadorResource {
     @Operation(summary = "Buscar prestador por OID")
     @APIResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = PrestadorResource.class)))
     public PrestadorResponse get(@PathParam("oid") String oid) {
+        auditoriaService.checkRoleAdminPrestador();
         return prestadorService.get(oid);
     }
 
@@ -50,7 +56,8 @@ public class PrestadorResource {
     @Operation(summary = "Listar prestadores (paginado)")
     public List<PrestadorResponse> list(@QueryParam("page") @DefaultValue("0") int page,
                                         @QueryParam("size") @DefaultValue("20") int size,
-                                        @QueryParam("sort") String sort) {
+                                        @QueryParam("sort") @DefaultValue("criadoEm") String sort) {
+        auditoriaService.checkRoleAdminPrestador();
         return prestadorService.list(page, size, sort);
     }
 
@@ -58,6 +65,7 @@ public class PrestadorResource {
     @Path("/{oid}")
     @Operation(summary = "Atualizar prestador")
     public PrestadorResponse update(@PathParam("oid") String oid, @Valid PrestadorUpdateRequest req) {
+        auditoriaService.checkRoleAdminPrestador();
         return prestadorService.update(oid, req);
     }
 
@@ -66,6 +74,7 @@ public class PrestadorResource {
     @Operation(summary = "Excluir prestador")
     @APIResponse(responseCode = "204", description = "Sem conteúdo")
     public Response delete(@PathParam("oid") String oid) {
+        auditoriaService.checkRoleAdminPrestador();
         prestadorService.delete(oid);
         return Response.noContent().build();
     }

@@ -1,5 +1,6 @@
 package br.com.codenest.marknow.service.auditoria;
 
+import br.com.codenest.marknow.enums.PrestadorUsuarioRole;
 import br.com.codenest.marknow.exception.BusinessException;
 import br.com.codenest.marknow.exception.ErrorCode;
 import br.com.codenest.marknow.security.TenantContext;
@@ -24,6 +25,36 @@ public class AuditoriaService {
             throw BusinessException.of(ErrorCode.UNAUTHORIZED, "Prestador não identificado no contexto da requisição.");
         }
         return ctx.prestadorOid;
+    }
+
+    public void checkSuperAdmin() {
+        if (!Boolean.TRUE.equals(ctx.superAdmin)) {
+            throw BusinessException.of(ErrorCode.FORBIDDEN, "Acesso restrito ao administrador do sistema.");
+        }
+    }
+
+    public void checkUserNotAdmin() {
+        if (Boolean.TRUE.equals(ctx.superAdmin)) {
+            throw BusinessException.of(ErrorCode.FORBIDDEN, "O administrador global não pode realizar operações de prestador.");
+        }
+    }
+
+    public void checkRoleAdminPrestador() {
+        checkUserNotAdmin();
+        if (ctx.rolePrestador != PrestadorUsuarioRole.ADMIN) {
+            throw BusinessException.of(ErrorCode.FORBIDDEN, "Ação permitida apenas para administradores da unidade.");
+        }
+    }
+
+    public void checkRoleOperacionalOuAdmin() {
+        checkUserNotAdmin();
+
+        boolean isAuthorized = ctx.rolePrestador == PrestadorUsuarioRole.ADMIN ||
+                ctx.rolePrestador == PrestadorUsuarioRole.OPERACIONAL;
+
+        if (!isAuthorized) {
+            throw BusinessException.of(ErrorCode.FORBIDDEN, "Ação permitida apenas para funcionários da unidade.");
+        }
     }
 
     public String oidUsuarioLogadoOrNull() {

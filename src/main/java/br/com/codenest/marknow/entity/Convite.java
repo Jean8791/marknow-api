@@ -1,12 +1,14 @@
 package br.com.codenest.marknow.entity;
 
 import br.com.codenest.marknow.entity.base.AbstractEntity;
+import br.com.codenest.marknow.util.UtilsRandom;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 @Getter
@@ -15,8 +17,11 @@ import java.time.Instant;
 @Table(name = "convite")
 public class Convite extends AbstractEntity {
 
-    @Column(name = "codigo", nullable = false, unique = true, length = 20)
+    @Column(name = "codigo", nullable = false, unique = true, length = 10)
     private String codigo;
+
+    @Column(name = "descricao")
+    private String descricao;
 
     @Column(name = "email_destinatario", length = 120)
     private String emailDestinatario;
@@ -42,12 +47,10 @@ public class Convite extends AbstractEntity {
 
     @PrePersist
     void beforePersist() {
+        if (this.codigo == null) this.codigo = UtilsRandom.numeroDigitos(6).toUpperCase();
         if (this.maxUsos == null) this.maxUsos = 1;
         if (this.qtdUsado == null) this.qtdUsado = 0;
-        if (this.expiraEm == null) this.expiraEm = Instant.now().plusSeconds(3600);
-        if (this.usuarioCriacao != null) {
-            this.oidUsuarioCriacao = this.usuarioCriacao.getOid();
-        }
+        if (this.expiraEm == null) this.expiraEm = Instant.now().plus(30, ChronoUnit.DAYS);
     }
 
     public boolean isValido() {
