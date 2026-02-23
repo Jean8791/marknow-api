@@ -7,11 +7,19 @@ import jakarta.persistence.PrePersist;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @MappedSuperclass
+@FilterDef(
+        name = "tenantFilter",
+        parameters = @ParamDef(name = "oidPrestador", type = String.class)
+)
+@Filter(name = "tenantFilter", condition = "oid_prestador = :oidPrestador")
 public abstract class AbstractTenantEntity extends AbstractEntity {
 
     @Column(name = "oid_prestador", nullable = false, length = 36)

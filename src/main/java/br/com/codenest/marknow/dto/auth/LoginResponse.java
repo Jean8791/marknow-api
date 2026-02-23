@@ -1,9 +1,14 @@
 package br.com.codenest.marknow.dto.auth;
 
-public class LoginResponse {
-    public String token;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-    public LoginResponse(String token) {
-        this.token = token;
-    }
+@Getter
+@Setter
+@NoArgsConstructor
+public class LoginResponse {
+    private String nome;
+    private String email;
+    private String token;
 }

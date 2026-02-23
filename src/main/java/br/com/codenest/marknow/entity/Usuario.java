@@ -1,8 +1,9 @@
 package br.com.codenest.marknow.entity;
 
 import br.com.codenest.marknow.entity.base.AbstractEntity;
-import br.com.codenest.marknow.entity.base.AbstractTenantEntity;
 import br.com.codenest.marknow.enums.UsuarioStatus;
+import br.com.codenest.marknow.util.UtilsSenha;
+import br.com.codenest.marknow.util.UtilsString;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

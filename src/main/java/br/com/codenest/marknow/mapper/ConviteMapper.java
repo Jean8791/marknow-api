@@ -10,7 +10,7 @@ public class ConviteMapper {
 
     public Convite toEntity(ConviteCreateRequest req) {
         Convite convite = new Convite();
-        convite.setCodigo(req.getCodigo());
+        convite.setDescricao(req.getDescricao());
         convite.setEmailDestinatario(req.getEmailDestinatario());
         convite.setExpiraEm(req.getExpiraEm());
         convite.setMaxUsos(req.getMaxUsos());
@@ -21,6 +21,7 @@ public class ConviteMapper {
         ConviteResponse planoResponse = new ConviteResponse();
         planoResponse.setOid(convite.getOid());
         planoResponse.setCodigo(convite.getCodigo());
+        planoResponse.setDescricao(convite.getDescricao());
         planoResponse.setEmailDestinatario(convite.getEmailDestinatario());
         planoResponse.setExpiraEm(convite.getExpiraEm());
         planoResponse.setMaxUsos(convite.getMaxUsos());
