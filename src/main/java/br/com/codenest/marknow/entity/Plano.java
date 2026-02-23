@@ -2,10 +2,7 @@ package br.com.codenest.marknow.entity;
 
 import br.com.codenest.marknow.entity.base.AbstractEntity;
 import br.com.codenest.marknow.enums.PlanoStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,6 +25,7 @@ public class Plano extends AbstractEntity {
     @Column(name = "valor", nullable = false)
     private BigDecimal valor;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private PlanoStatus status;
 

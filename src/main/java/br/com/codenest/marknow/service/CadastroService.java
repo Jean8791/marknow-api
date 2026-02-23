@@ -5,16 +5,14 @@ import br.com.codenest.marknow.dto.cadastro.CadastroResponse;
 import br.com.codenest.marknow.dto.prestador.PrestadorResponse;
 import br.com.codenest.marknow.dto.usuario.UsuarioResponse;
 import br.com.codenest.marknow.entity.Assinatura;
+import br.com.codenest.marknow.entity.Convite;
 import br.com.codenest.marknow.entity.Plano;
 import br.com.codenest.marknow.entity.PrestadorUsuario;
 import br.com.codenest.marknow.enums.AssinaturaStatus;
 import br.com.codenest.marknow.enums.PrestadorUsuarioRole;
 import br.com.codenest.marknow.exception.BusinessException;
 import br.com.codenest.marknow.exception.ErrorCode;
-import br.com.codenest.marknow.repository.AssinaturaRepository;
-import br.com.codenest.marknow.repository.PlanoRepository;
-import br.com.codenest.marknow.repository.PrestadorUsuarioRepository;
-import br.com.codenest.marknow.repository.UsuarioRepository;
+import br.com.codenest.marknow.repository.*;
 import br.com.codenest.marknow.service.auth.AuthService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -29,19 +27,27 @@ public class CadastroService {
 
     @Inject
     AuthService authService;
+
     @Inject
     UsuarioRepository usuarioRepository;
+
     @Inject
     PrestadorUsuarioRepository prestadorUsuarioRepository;
+
     @Inject
     AssinaturaRepository assinaturaRepository;
+
     @Inject
     PrestadorService prestadorService;
+
     @Inject
     UsuarioService usuarioService;
 
     @Inject
     PlanoRepository planoRepository;
+
+    @Inject
+    ConviteRepository conviteRepository;
 
     @Transactional
     public CadastroResponse create(@Valid CadastroCreateRequest req) {
@@ -49,6 +55,22 @@ public class CadastroService {
         if (req == null || req.getUsuario() == null || req.getPrestador() == null) {
             throw BusinessException.of(ErrorCode.UNPROCESSABLE, "Payload inválido (usuario e prestador são obrigatórios).");
         }
+
+
+        Convite convite = conviteRepository.findByCodigo(req.getCodigo());
+
+        if (convite == null) {
+            throw BusinessException.of(ErrorCode.NOT_FOUND, "Convite inválido ou inexistente.");
+        }
+
+        if (convite.getExpiraEm() != null && convite.getExpiraEm().isBefore(Instant.now())) {
+            throw BusinessException.of(ErrorCode.FORBIDDEN, "Este convite já expirou.");
+        }
+
+        if (convite.getQtdUsado() >= convite.getMaxUsos()) {
+            throw BusinessException.of(ErrorCode.FORBIDDEN, "Este convite já atingiu o limite de usos.");
+        }
+
 
         String email = req.getUsuario().getEmail();
         if (email == null || email.isBlank()) {
@@ -91,6 +113,9 @@ public class CadastroService {
 
         assinatura.setProvedor("INTERNO");
         assinaturaRepository.persist(assinatura);
+
+        convite.setQtdUsado(convite.getQtdUsado() + 1);
+        conviteRepository.persist(convite);
 
         String token = authService.gerarToken(prestador.getOid(), usuario.getOid(), email);
 

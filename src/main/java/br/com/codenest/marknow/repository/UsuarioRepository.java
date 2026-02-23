@@ -44,7 +44,4 @@ public class UsuarioRepository implements PanacheRepositoryBase<Usuario, String>
         return "desc".equalsIgnoreCase(direction) ? s.descending() : s.ascending();
     }
 
-    public Usuario findByEmail(String lowerCase) {
-        return null;
-    }
 }
