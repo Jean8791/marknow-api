@@ -18,7 +18,7 @@ public class AssinaturaScheduler {
     @Inject
     AssinaturaPolitica politica;
 
-    @Scheduled(every = "10m")
+    @Scheduled(every = "2m")
     @Transactional
     void verificarAssinaturas() {
         Instant now = Instant.now();

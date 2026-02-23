@@ -90,12 +90,6 @@ public class CadastroService {
             throw BusinessException.of(ErrorCode.UNPROCESSABLE, "Plano inválido");
         }
 
-        PrestadorUsuario pu = new PrestadorUsuario();
-        pu.setOidPrestador(prestador.getOid());
-        pu.setOidUsuario(usuario.getOid());
-        pu.setRole(PrestadorUsuarioRole.ADMIN);
-        prestadorUsuarioRepository.persist(pu);
-
         Instant agora = Instant.now();
 
         Assinatura assinatura = new Assinatura();
@@ -117,7 +111,7 @@ public class CadastroService {
         convite.setQtdUsado(convite.getQtdUsado() + 1);
         conviteRepository.persist(convite);
 
-        String token = jwtUtil.gerarToken(prestador.getOid(), usuario.getOid(), email, pu.getRole());
+        String token = jwtUtil.gerarToken(prestador.getOid(), usuario.getOid(), email, PrestadorUsuarioRole.ADMIN);
 
         return new CadastroResponse(prestador.getOid(), token);
     }

@@ -15,6 +15,9 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 public class UsuarioCreateResquest {
 
     @NotBlank
+    public String oidPrestador;
+
+    @NotBlank
     @EmailStrict
     @Schema(required = true, example = "admin@prestador.com")
     public String email;

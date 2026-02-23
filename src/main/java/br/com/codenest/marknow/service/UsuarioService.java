@@ -26,11 +26,15 @@ public class UsuarioService {
     @Inject
     UsuarioMapper mapper;
 
+    @Inject
+    PrestadorUsuarioService prestadorUsuarioService;
+
     @Transactional
     public UsuarioResponse create(@Valid UsuarioCreateResquest req) {
         validacaoCreat(req);
         Usuario usuario = mapper.toEntity(req);
         repo.persist(usuario);
+        prestadorUsuarioService.create(usuario.getOid(), req.getOidPrestador());
         return mapper.toResponse(usuario);
     }
 
