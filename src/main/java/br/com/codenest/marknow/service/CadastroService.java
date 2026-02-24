@@ -7,13 +7,13 @@ import br.com.codenest.marknow.dto.usuario.UsuarioResponse;
 import br.com.codenest.marknow.entity.Assinatura;
 import br.com.codenest.marknow.entity.Convite;
 import br.com.codenest.marknow.entity.Plano;
-import br.com.codenest.marknow.entity.PrestadorUsuario;
 import br.com.codenest.marknow.enums.AssinaturaStatus;
 import br.com.codenest.marknow.enums.PrestadorUsuarioRole;
 import br.com.codenest.marknow.exception.BusinessException;
 import br.com.codenest.marknow.exception.ErrorCode;
 import br.com.codenest.marknow.repository.*;
 import br.com.codenest.marknow.service.auth.JwtUtil;
+import br.com.codenest.marknow.util.UtilsString;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -56,7 +56,6 @@ public class CadastroService {
             throw BusinessException.of(ErrorCode.UNPROCESSABLE, "Payload inválido (usuario e prestador são obrigatórios).");
         }
 
-
         Convite convite = conviteRepository.findByCodigo(req.getCodigo());
 
         if (convite == null) {
@@ -71,6 +70,9 @@ public class CadastroService {
             throw BusinessException.of(ErrorCode.FORBIDDEN, "Este convite já atingiu o limite de usos.");
         }
 
+        if (UtilsString.temTexto(convite.getEmailDestinatario()) && !convite.getEmailDestinatario().equals(req.getUsuario().getEmail())) {
+            throw BusinessException.of(ErrorCode.FORBIDDEN, "E-mail nao corresponde ao convite");
+        }
 
         String email = req.getUsuario().getEmail();
         if (email == null || email.isBlank()) {
@@ -81,14 +83,18 @@ public class CadastroService {
             throw BusinessException.of(ErrorCode.CONFLICT, "Já existe usuário cadastrado com este e-mail.");
         }
 
-        PrestadorResponse prestador = prestadorService.create(req.getPrestador());
-        UsuarioResponse usuario = usuarioService.create(req.getUsuario());
-
         Plano plano = planoRepository.findByOid(req.getOidPlano());
 
         if (plano == null) {
             throw BusinessException.of(ErrorCode.UNPROCESSABLE, "Plano inválido");
         }
+
+        PrestadorResponse prestador = prestadorService.create(req.getPrestador());
+
+        req.getUsuario().setOidPrestador(prestador.getOid());
+        req.getUsuario().setRole(PrestadorUsuarioRole.ADMIN);
+
+        UsuarioResponse usuario = usuarioService.create(req.getUsuario());
 
         Instant agora = Instant.now();
 
