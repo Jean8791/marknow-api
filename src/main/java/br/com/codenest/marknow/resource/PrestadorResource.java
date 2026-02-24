@@ -33,16 +33,6 @@ public class PrestadorResource {
     @Inject
     PrestadorService prestadorService;
 
-    @POST
-    @Operation(summary = "Criar prestador")
-    @APIResponse(responseCode = "201", description = "Criada", content = @Content(schema = @Schema(implementation = PrestadorResponse.class)))
-    public Response create(@Valid PrestadorCreateRequest req, @Context UriInfo uriInfo) {
-        auditoriaService.checkRoleAdminPrestador();
-        PrestadorResponse created = prestadorService.create(req);
-        URI location = uriInfo.getAbsolutePathBuilder().path(created.getOid()).build();
-        return Response.created(location).entity(created).build();
-    }
-
     @GET
     @Path("/{oid}")
     @Operation(summary = "Buscar prestador por OID")

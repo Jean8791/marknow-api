@@ -3,6 +3,7 @@ package br.com.codenest.marknow.resource;
 import br.com.codenest.marknow.dto.usuario.UsuarioCreateResquest;
 import br.com.codenest.marknow.dto.usuario.UsuarioResponse;
 import br.com.codenest.marknow.dto.usuario.UsuarioUpdateResquest;
+import br.com.codenest.marknow.enums.PrestadorUsuarioRole;
 import br.com.codenest.marknow.service.UsuarioService;
 import br.com.codenest.marknow.service.auditoria.AuditoriaService;
 import jakarta.inject.Inject;

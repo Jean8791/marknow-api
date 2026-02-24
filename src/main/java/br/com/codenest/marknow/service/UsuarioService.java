@@ -34,7 +34,7 @@ public class UsuarioService {
         validacaoCreat(req);
         Usuario usuario = mapper.toEntity(req);
         repo.persist(usuario);
-        prestadorUsuarioService.create(usuario.getOid(), req.getOidPrestador());
+        prestadorUsuarioService.create(usuario.getOid(), req);
         return mapper.toResponse(usuario);
     }
 

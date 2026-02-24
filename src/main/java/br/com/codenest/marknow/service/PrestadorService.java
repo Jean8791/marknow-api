@@ -29,7 +29,6 @@ public class PrestadorService {
         validacaoCreat(req);
         Prestador prestador = mapper.toEntity(req);
         repo.persist(prestador);
-
         return mapper.toResponse(prestador);
     }
 
