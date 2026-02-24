@@ -1,15 +1,21 @@
+# Estágio 1: Build
 FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copia TUDO que está na raiz (incluindo src e pom.xml)
+# Copia tudo da raiz do seu git para dentro de /app no container
 COPY . .
 
-# Roda o Maven apontando para o pom.xml que acabou de ser copiado
+# LISTA OS ARQUIVOS (Isso vai aparecer no seu log do Render para debugarmos)
+RUN ls -la
+
+# Roda o Maven garantindo que ele procure o pom.xml na pasta atual
 RUN mvn clean package -DskipTests
 
+# Estágio 2: Runtime
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /deployments
-# O Quarkus gera o resultado em target/quarkus-app/
+
+# Copia o resultado do build do estágio anterior
 COPY --from=build /app/target/quarkus-app/ .
 
 EXPOSE 8080
