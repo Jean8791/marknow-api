@@ -34,7 +34,7 @@ public class PlanoCreateRequest {
 
     @JsonSetter("nome")
     public void setNome(String nome) {
-        this.nome = UtilsString.slugParaNull(nome);
+        this.nome = UtilsString.apararParaNull(nome);
     }
 
     @JsonSetter("limiteAgendamentos")
