@@ -1,22 +1,16 @@
-# Estágio 1: Build
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+# Imagem runtime
+FROM eclipse-temurin:17-jre
+
 WORKDIR /app
 
-# Copia tudo da raiz do seu git para dentro de /app no container
-COPY . .
+# Copia o jar gerado pelo build (ajuste o nome)
+COPY target/*.jar app.jar
 
-# LISTA OS ARQUIVOS (Isso vai aparecer no seu log do Render para debugarmos)
-RUN ls -la
-
-# Roda o Maven garantindo que ele procure o pom.xml na pasta atual
-RUN mvn clean package -DskipTests
-
-# Estágio 2: Runtime
-FROM eclipse-temurin:17-jre-jammy
-WORKDIR /deployments
-
-# Copia o resultado do build do estágio anterior
-COPY --from=build /app/target/quarkus-app/ .
-
+# Render define a porta em $PORT. Seu app TEM que escutar nela.
+ENV PORT=8080
 EXPOSE 8080
-ENTRYPOINT [ "java", "-jar", "quarkus-run.jar" ]
+
+# JVM flags básicas (ajuste se quiser)
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
+
+CMD ["sh", "-c", "java $JAVA_OPTS -Dserver.port=${PORT} -jar app.jar"]
