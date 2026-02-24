@@ -1,16 +1,16 @@
 FROM maven:3.9.6-eclipse-temurin-17 AS build
-WORKDIR /workspace
+WORKDIR /app
 
-# Copia apenas o pom primeiro
-COPY pom.xml .
-# Tenta copiar a pasta src (usando o caminho relativo correto)
-COPY src ./src
+# Copia TUDO que está na raiz (incluindo src e pom.xml)
+COPY . .
 
+# Roda o Maven apontando para o pom.xml que acabou de ser copiado
 RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /deployments
-COPY --from=build /workspace/target/quarkus-app/ .
+# O Quarkus gera o resultado em target/quarkus-app/
+COPY --from=build /app/target/quarkus-app/ .
 
 EXPOSE 8080
 ENTRYPOINT [ "java", "-jar", "quarkus-run.jar" ]
