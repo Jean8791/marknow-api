@@ -27,12 +27,12 @@ public class PrestadorCreateRequest {
 
     @JsonSetter("nome")
     public void setNome(String nome) {
-        this.nome = UtilsString.slugParaNull(nome);
+        this.nome = UtilsString.apararParaNull(nome);
     }
 
     @JsonSetter("documento")
     public void setDocumento(String documento) {
-        this.documento = UtilsString.slugParaNull(documento);
+        this.documento = UtilsString.apararParaNull(documento);
     }
 
     @JsonSetter("tipoPessoa")
