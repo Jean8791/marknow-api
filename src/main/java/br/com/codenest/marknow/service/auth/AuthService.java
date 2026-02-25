@@ -8,7 +8,6 @@ import br.com.codenest.marknow.entity.PrestadorUsuario;
 import br.com.codenest.marknow.entity.Usuario;
 import br.com.codenest.marknow.enums.PrestadorStatus;
 import br.com.codenest.marknow.enums.PrestadorUsuarioRole;
-import br.com.codenest.marknow.enums.PrestadorUsuarioStatus;
 import br.com.codenest.marknow.enums.UsuarioStatus;
 import br.com.codenest.marknow.exception.BusinessException;
 import br.com.codenest.marknow.exception.ErrorCode;
@@ -87,7 +86,7 @@ public class AuthService {
             role = pu.getRole();
         }
 
-        return mapper.toResponse(usuario, jwtUtil.gerarToken(oidPrestadorParaToken, usuario.getOid(), usuario.getEmail(), role));
+        return mapper.toResponse(usuario, role, jwtUtil.gerarToken(oidPrestadorParaToken, usuario.getOid(), usuario.getEmail(), role));
     }
 
 }
