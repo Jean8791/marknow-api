@@ -1,6 +1,6 @@
 package br.com.codenest.marknow.dto.auth;
 
-import br.com.codenest.marknow.enums.PrestadorUsuarioRole;
+import br.com.codenest.marknow.enums.LoginResponseRole;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,10 +16,10 @@ public class LoginResponse {
     @Getter
     @Setter
     @NoArgsConstructor
-    public class Usuario {
+    public static class Usuario {
         private String oid;
         private String nome;
         private String email;
-        private PrestadorUsuarioRole perfil;
+        private LoginResponseRole perfil;
     }
 }
