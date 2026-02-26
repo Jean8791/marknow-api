@@ -1,5 +1,6 @@
 package br.com.codenest.marknow.service;
 
+import br.com.codenest.marknow.dto.common.PageDTO;
 import br.com.codenest.marknow.dto.prestador.PrestadorCreateRequest;
 import br.com.codenest.marknow.dto.prestador.PrestadorResponse;
 import br.com.codenest.marknow.dto.prestador.PrestadorUpdateRequest;
@@ -8,12 +9,13 @@ import br.com.codenest.marknow.exception.BusinessException;
 import br.com.codenest.marknow.exception.ErrorCode;
 import br.com.codenest.marknow.mapper.PrestadorMapper;
 import br.com.codenest.marknow.repository.PrestadorRepository;
+import br.com.codenest.marknow.util.PaginationUtil;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-
-import java.util.List;
 
 @ApplicationScoped
 public class PrestadorService {
@@ -47,8 +49,10 @@ public class PrestadorService {
         return mapper.toResponse(prestador);
     }
 
-    public List<PrestadorResponse> list(int page, int size, String sort) {
-        return repo.findAll(page, size, sort).stream().map(mapper::toResponse).toList();
+    public PageDTO<PrestadorResponse> list(int page, int size, String sort) {
+        PanacheQuery<Prestador> query = repo.findAll(Sort.by(sort));
+        query.page(page, size);
+        return PaginationUtil.toPageDTO(query, mapper::toResponse);
     }
 
     @Transactional
