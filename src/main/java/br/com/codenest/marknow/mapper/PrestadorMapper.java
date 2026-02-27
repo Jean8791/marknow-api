@@ -1,43 +1,86 @@
 package br.com.codenest.marknow.mapper;
 
 import br.com.codenest.marknow.dto.prestador.PrestadorCreateRequest;
-import br.com.codenest.marknow.dto.prestador.PrestadorDetalhadoResponse;
 import br.com.codenest.marknow.dto.prestador.PrestadorResponse;
 import br.com.codenest.marknow.dto.prestador.PrestadorUpdateRequest;
-import br.com.codenest.marknow.entity.Assinatura;
-import br.com.codenest.marknow.entity.Plano;
 import br.com.codenest.marknow.entity.Prestador;
+import br.com.codenest.marknow.enums.TipoPessoa;
+import br.com.codenest.marknow.util.UtilsString;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class PrestadorMapper {
 
-
     public Prestador toEntity(PrestadorCreateRequest dto) {
         Prestador prestador = new Prestador();
-        prestador.setNome(dto.getNome());
-        prestador.setDocumento(dto.getDocumento());
-        prestador.setTipoPessoa(dto.getTipoPessoa());
+        updateEntityFromDto(
+                prestador,
+                dto.getNome(),
+                dto.getDocumento(),
+                dto.getTipoPessoa(),
+                dto.getCep(),
+                dto.getLogradouro(),
+                dto.getNumero(),
+                dto.getBairro(),
+                dto.getCidade(),
+                dto.getUf(),
+                dto.getComplemento(),
+                dto.getLogoUrl()
+        );
         return prestador;
     }
 
     public void toUpdateEntity(Prestador prestador, PrestadorUpdateRequest dto) {
-        if (dto.getNome() != null) prestador.setNome(dto.getNome());
-        if (dto.getDocumento() != null) prestador.setDocumento(dto.getDocumento());
-        if (dto.getTipoPessoa() != null) prestador.setTipoPessoa(dto.getTipoPessoa());
+        updateEntityFromDto(
+                prestador,
+                dto.getNome(),
+                dto.getDocumento(),
+                dto.getTipoPessoa(),
+                dto.getCep(),
+                dto.getLogradouro(),
+                dto.getNumero(),
+                dto.getBairro(),
+                dto.getCidade(),
+                dto.getUf(),
+                dto.getComplemento(),
+                dto.getLogoUrl()
+        );
     }
 
-    public PrestadorResponse toResponse(Prestador prestador) {
-        PrestadorResponse prestadorResponse = new PrestadorResponse();
-        prestadorResponse.setOid(prestador.getOid());
-        prestadorResponse.setNome(prestador.getNome());
-        prestadorResponse.setDocumento(prestador.getDocumento());
-        prestadorResponse.setTipoPessoa(prestador.getTipoPessoa());
-        prestadorResponse.setStatus(prestador.getStatus());
-        prestadorResponse.setCreatedAt(prestador.getCriadoEm());
-        prestadorResponse.setUpdatedAt(prestador.getAtualizadoEm());
-        return prestadorResponse;
+    public PrestadorResponse toResponse(Prestador p) {
+        PrestadorResponse res = new PrestadorResponse();
+        res.setOid(p.getOid());
+        res.setNome(p.getNome());
+        res.setDocumento(p.getDocumento());
+        res.setTipoPessoa(p.getTipoPessoa());
+        res.setStatus(p.getStatus());
+        res.setCreatedAt(p.getCriadoEm());
+        res.setUpdatedAt(p.getAtualizadoEm());
+
+        res.setCep(p.getCep());
+        res.setLogradouro(p.getLogradouro());
+        res.setNumero(p.getNumero());
+        res.setBairro(p.getBairro());
+        res.setCidade(p.getCidade());
+        res.setUf(p.getUf());
+        res.setComplemento(p.getComplemento());
+        res.setLogoUrl(p.getLogoUrl());
+        return res;
     }
 
-
+    private void updateEntityFromDto(Prestador p, String nome, String doc, TipoPessoa tp,
+                                     String cep, String log, String num, String bai,
+                                     String cid, String uf, String comp, String logo) {
+        if (UtilsString.temTexto(nome)) p.setNome(nome);
+        if (UtilsString.temTexto(doc)) p.setDocumento(doc);
+        if (tp != null) p.setTipoPessoa(tp);
+        if (UtilsString.temTexto(cep)) p.setCep(cep);
+        if (UtilsString.temTexto(log)) p.setLogradouro(log);
+        if (UtilsString.temTexto(num)) p.setNumero(num);
+        if (UtilsString.temTexto(bai)) p.setBairro(bai);
+        if (UtilsString.temTexto(cid)) p.setCidade(cid);
+        if (UtilsString.temTexto(uf)) p.setUf(uf);
+        if (UtilsString.temTexto(comp)) p.setComplemento(comp);
+        if (UtilsString.temTexto(logo)) p.setLogoUrl(logo);
+    }
 }

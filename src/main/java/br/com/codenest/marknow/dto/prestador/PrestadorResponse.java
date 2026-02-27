@@ -19,4 +19,12 @@ public class PrestadorResponse {
     private PrestadorStatus status;
     private Instant createdAt;
     private Instant updatedAt;
+    private String cep;
+    private String logradouro;
+    private String numero;
+    private String bairro;
+    private String cidade;
+    private String uf;
+    private String complemento;
+    private String logoUrl;
 }

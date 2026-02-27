@@ -11,6 +11,7 @@ import br.com.codenest.marknow.exception.ErrorCode;
 import br.com.codenest.marknow.mapper.PrestadorMapper;
 import br.com.codenest.marknow.repository.PrestadorRepository;
 import br.com.codenest.marknow.util.PaginationUtil;
+import br.com.codenest.marknow.util.UtilsString;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -37,6 +38,9 @@ public class PrestadorService {
 
     @Transactional
     public PrestadorResponse update(String oid, @Valid PrestadorUpdateRequest req) {
+        if (UtilsString.temTexto(oid) && !oid.equals(req.getOid())) {
+            throw BusinessException.of(ErrorCode.NOT_FOUND, "Prestador não encontrado.");
+        }
         Prestador prestador = repo.findById(req.getOid());
         validacaoUpdate(prestador, req);
         mapper.toUpdateEntity(prestador, req);
@@ -44,6 +48,7 @@ public class PrestadorService {
         return mapper.toResponse(prestador);
     }
 
+    @Transactional
     public PrestadorResponse get(String oid) {
         Prestador prestador = repo.findById(oid);
         if (prestador == null) throw BusinessException.of(ErrorCode.NOT_FOUND, "Prestador não encontrado.");

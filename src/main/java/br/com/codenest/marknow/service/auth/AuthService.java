@@ -86,7 +86,7 @@ public class AuthService {
             role = pu.getRole();
         }
 
-        return mapper.toResponse(usuario, role, jwtUtil.gerarToken(oidPrestadorParaToken, usuario.getOid(), usuario.getEmail(), role));
+        return mapper.toResponse(usuario, oidPrestadorParaToken, role, jwtUtil.gerarToken(oidPrestadorParaToken, usuario.getOid(), usuario.getEmail(), role));
     }
 
 }

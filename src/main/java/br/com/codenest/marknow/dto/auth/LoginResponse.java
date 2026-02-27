@@ -20,6 +20,7 @@ public class LoginResponse {
         private String oid;
         private String nome;
         private String email;
+        private String oidPrestador;
         private LoginResponseRole perfil;
     }
 }
