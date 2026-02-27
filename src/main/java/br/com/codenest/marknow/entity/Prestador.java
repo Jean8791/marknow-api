@@ -29,6 +29,10 @@ public class Prestador extends AbstractEntity {
     @Column(name = "status", nullable = false, length = 20)
     private PrestadorStatus status;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "oid", referencedColumnName = "oid_prestador", insertable = false, updatable = false)
+    private Assinatura assinatura;
+
     @PrePersist
     public void beforePersist() {
         if (this.status == null) {

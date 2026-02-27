@@ -3,6 +3,7 @@ package br.com.codenest.marknow.resource;
 import br.com.codenest.marknow.dto.cadastro.CadastroCreateRequest;
 import br.com.codenest.marknow.dto.cadastro.CadastroResponse;
 import br.com.codenest.marknow.dto.common.PageDTO;
+import br.com.codenest.marknow.dto.prestador.PrestadorDetalhadoResponse;
 import br.com.codenest.marknow.dto.prestador.PrestadorResponse;
 import br.com.codenest.marknow.dto.prestador.PrestadorUpdateRequest;
 import br.com.codenest.marknow.service.CadastroService;
@@ -40,11 +41,11 @@ public class PrestadorResource {
 
     @GET
     @Operation(summary = "Listar prestadores (paginado)")
-    public PageDTO<PrestadorResponse> list(@QueryParam("page") @DefaultValue("0") int page,
-                                           @QueryParam("size") @DefaultValue("20") int size,
-                                           @QueryParam("sort") @DefaultValue("criadoEm") String sort) {
+    public PageDTO<PrestadorDetalhadoResponse> list(@QueryParam("page") @DefaultValue("0") int page,
+                                                    @QueryParam("size") @DefaultValue("20") int size,
+                                                    @QueryParam("sort") @DefaultValue("criadoEm") String sort) {
         auditoriaService.checkSuperAdmin();
-        return prestadorService.list(page, size, sort);
+        return prestadorService.listDetailed(page, size, sort);
     }
 
     @POST
