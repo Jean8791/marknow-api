@@ -9,7 +9,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class LoginMapper {
 
-    public LoginResponse toResponse(Usuario usuario, PrestadorUsuarioRole role, String token) {
+    public LoginResponse toResponse(Usuario usuario, String oidPrestador, PrestadorUsuarioRole role, String token) {
         LoginResponse resp = new LoginResponse();
         resp.setToken(token);
 
@@ -17,8 +17,7 @@ public class LoginMapper {
         dtoUser.setOid(usuario.getOid());
         dtoUser.setNome(usuario.getNome());
         dtoUser.setEmail(usuario.getEmail());
-
-        // Atribui o perfil validando o boolean admin
+        dtoUser.setOidPrestador(oidPrestador);
         dtoUser.setPerfil(definirPerfil(usuario, role));
 
         return resp;

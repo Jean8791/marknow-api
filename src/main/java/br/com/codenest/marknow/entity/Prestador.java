@@ -29,6 +29,30 @@ public class Prestador extends AbstractEntity {
     @Column(name = "status", nullable = false, length = 20)
     private PrestadorStatus status;
 
+    @Column(name = "cep", length = 9)
+    private String cep;
+
+    @Column(name = "logradouro", length = 150)
+    private String logradouro;
+
+    @Column(name = "numero", length = 20)
+    private String numero;
+
+    @Column(name = "bairro", length = 100)
+    private String bairro;
+
+    @Column(name = "cidade", length = 100)
+    private String cidade;
+
+    @Column(name = "uf", length = 2)
+    private String uf;
+
+    @Column(name = "complemento", length = 100)
+    private String complemento;
+
+    @Column(name = "logo_url", columnDefinition = "TEXT")
+    private String logoUrl;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "oid", referencedColumnName = "oid_prestador", insertable = false, updatable = false)
     private Assinatura assinatura;
