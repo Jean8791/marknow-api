@@ -1,6 +1,7 @@
 package br.com.codenest.marknow.dto.prestador;
 
 import br.com.codenest.marknow.enums.TipoPessoa;
+import br.com.codenest.marknow.util.UtilsDocumento;
 import br.com.codenest.marknow.util.UtilsString;
 import br.com.codenest.marknow.validation.CpfOrCnpj;
 import com.fasterxml.jackson.annotation.JsonSetter;
@@ -77,7 +78,7 @@ public class PrestadorUpdateRequest {
 
     @JsonSetter("documento")
     public void setDocumento(String documento) {
-        this.documento = UtilsString.apararParaNull(documento);
+        this.documento = UtilsDocumento.apenasDigitosParaNull(documento);
     }
 
     @JsonSetter("cep")
