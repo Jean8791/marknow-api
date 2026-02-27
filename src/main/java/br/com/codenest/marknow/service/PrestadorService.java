@@ -2,6 +2,7 @@ package br.com.codenest.marknow.service;
 
 import br.com.codenest.marknow.dto.common.PageDTO;
 import br.com.codenest.marknow.dto.prestador.PrestadorCreateRequest;
+import br.com.codenest.marknow.dto.prestador.PrestadorDetalhadoResponse;
 import br.com.codenest.marknow.dto.prestador.PrestadorResponse;
 import br.com.codenest.marknow.dto.prestador.PrestadorUpdateRequest;
 import br.com.codenest.marknow.entity.Prestador;
@@ -49,10 +50,13 @@ public class PrestadorService {
         return mapper.toResponse(prestador);
     }
 
-    public PageDTO<PrestadorResponse> list(int page, int size, String sort) {
-        PanacheQuery<Prestador> query = repo.findAll(Sort.by(sort));
+    public PageDTO<PrestadorDetalhadoResponse> listDetailed(int page, int size, String sort) {
+        String field = sort.contains(".") ? sort : "p." + sort;
+
+        PanacheQuery<PrestadorDetalhadoResponse> query = repo.findDetailed(Sort.by(field));
         query.page(page, size);
-        return PaginationUtil.toPageDTO(query, mapper::toResponse);
+
+        return PaginationUtil.toPageDTO(query, dto -> dto);
     }
 
     @Transactional

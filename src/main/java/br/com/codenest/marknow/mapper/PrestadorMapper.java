@@ -1,8 +1,11 @@
 package br.com.codenest.marknow.mapper;
 
 import br.com.codenest.marknow.dto.prestador.PrestadorCreateRequest;
+import br.com.codenest.marknow.dto.prestador.PrestadorDetalhadoResponse;
 import br.com.codenest.marknow.dto.prestador.PrestadorResponse;
 import br.com.codenest.marknow.dto.prestador.PrestadorUpdateRequest;
+import br.com.codenest.marknow.entity.Assinatura;
+import br.com.codenest.marknow.entity.Plano;
 import br.com.codenest.marknow.entity.Prestador;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -35,4 +38,6 @@ public class PrestadorMapper {
         prestadorResponse.setUpdatedAt(prestador.getAtualizadoEm());
         return prestadorResponse;
     }
+
+
 }
