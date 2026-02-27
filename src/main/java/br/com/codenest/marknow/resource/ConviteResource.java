@@ -1,15 +1,13 @@
 package br.com.codenest.marknow.resource;
 
+import br.com.codenest.marknow.dto.common.PageDTO;
 import br.com.codenest.marknow.dto.convite.ConviteCreateRequest;
 import br.com.codenest.marknow.dto.convite.ConviteResponse;
 import br.com.codenest.marknow.service.ConviteService;
 import br.com.codenest.marknow.service.auditoria.AuditoriaService;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -23,7 +21,6 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import java.net.URI;
 
 @Path("/convite")
-@Tag(name = "Cadastro")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ConviteResource {
@@ -42,5 +39,13 @@ public class ConviteResource {
         ConviteResponse created = cadastroService.create(req);
         URI location = uriInfo.getAbsolutePathBuilder().path(created.getOid()).build();
         return Response.created(location).entity(created).build();
+    }
+
+    @GET
+    public PageDTO<ConviteResponse> list(@QueryParam("page") @DefaultValue("0") int page,
+                                         @QueryParam("size") @DefaultValue("10") int size,
+                                         @QueryParam("descricao") String descricao) {
+        auditoriaService.checkSuperAdmin();
+        return cadastroService.list(page, size, descricao);
     }
 }

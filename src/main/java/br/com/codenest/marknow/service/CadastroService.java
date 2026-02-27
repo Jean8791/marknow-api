@@ -11,7 +11,10 @@ import br.com.codenest.marknow.enums.AssinaturaStatus;
 import br.com.codenest.marknow.enums.PrestadorUsuarioRole;
 import br.com.codenest.marknow.exception.BusinessException;
 import br.com.codenest.marknow.exception.ErrorCode;
-import br.com.codenest.marknow.repository.*;
+import br.com.codenest.marknow.repository.AssinaturaRepository;
+import br.com.codenest.marknow.repository.ConviteRepository;
+import br.com.codenest.marknow.repository.PlanoRepository;
+import br.com.codenest.marknow.repository.UsuarioRepository;
 import br.com.codenest.marknow.service.auth.JwtUtil;
 import br.com.codenest.marknow.util.UtilsString;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -30,9 +33,6 @@ public class CadastroService {
 
     @Inject
     UsuarioRepository usuarioRepository;
-
-    @Inject
-    PrestadorUsuarioRepository prestadorUsuarioRepository;
 
     @Inject
     AssinaturaRepository assinaturaRepository;
