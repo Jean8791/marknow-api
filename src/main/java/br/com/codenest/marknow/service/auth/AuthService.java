@@ -12,7 +12,6 @@ import br.com.codenest.marknow.enums.UsuarioStatus;
 import br.com.codenest.marknow.exception.BusinessException;
 import br.com.codenest.marknow.exception.ErrorCode;
 import br.com.codenest.marknow.mapper.LoginMapper;
-import br.com.codenest.marknow.repository.AssinaturaRepository;
 import br.com.codenest.marknow.repository.PrestadorUsuarioRepository;
 import br.com.codenest.marknow.repository.UsuarioRepository;
 import br.com.codenest.marknow.service.assinatura.AssinaturaPolitica;
@@ -34,9 +33,6 @@ public class AuthService {
 
     @Inject
     UsuarioRepository usuarioRepository;
-
-    @Inject
-    AssinaturaRepository assinaturaRepository;
 
     @Inject
     PrestadorUsuarioRepository prestadorUsuarioRepository;
