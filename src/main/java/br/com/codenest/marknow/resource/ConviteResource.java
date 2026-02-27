@@ -4,6 +4,7 @@ import br.com.codenest.marknow.dto.common.PageDTO;
 import br.com.codenest.marknow.dto.convite.ConviteCreateRequest;
 import br.com.codenest.marknow.dto.convite.ConviteResponse;
 import br.com.codenest.marknow.service.ConviteService;
+import br.com.codenest.marknow.service.EmailService;
 import br.com.codenest.marknow.service.auditoria.AuditoriaService;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;

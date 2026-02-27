@@ -1,6 +1,5 @@
 package br.com.codenest.marknow.dto.convite;
 
-import br.com.codenest.marknow.util.UtilsData;
 import br.com.codenest.marknow.util.UtilsString;
 import br.com.codenest.marknow.util.UtilsValor;
 import com.fasterxml.jackson.annotation.JsonSetter;
@@ -29,6 +28,8 @@ public class ConviteCreateRequest {
 
     @NotNull(message = "Informe o maximo de uso")
     private Integer maxUsos;
+
+    private Boolean enviarEmail;
 
     @JsonSetter("descricao")
     public void setDescricao(String descricao) {
