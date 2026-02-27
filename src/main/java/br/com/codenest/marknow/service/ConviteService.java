@@ -32,13 +32,24 @@ public class ConviteService {
     @Inject
     ConviteMapper mapper;
 
+    @Inject
+    EmailService emailService;
+
     @Transactional
     public ConviteResponse create(@Valid ConviteCreateRequest req) {
         validar(req);
         Convite convite = mapper.toEntity(req);
         convite.setOidUsuarioCriacao(auditoriaService.oidUsuarioLogadoOrThrow());
         conviteRepository.persist(convite);
+        if (Boolean.TRUE.equals(req.getEnviarEmail())) {
+            enviarEmail(convite);
+        }
         return mapper.toResponse(convite);
+    }
+
+    @Transactional
+    public void enviarEmail(Convite convite) {
+        emailService.enviarEmailConvite();
     }
 
     public ConviteResponse get(String oid) {
