@@ -18,6 +18,11 @@ public class PrestadorMapper {
                 dto.getNome(),
                 dto.getDocumento(),
                 dto.getTipoPessoa(),
+                dto.getEmail(),
+                dto.getDddTelefone(),
+                dto.getTelefone(),
+                dto.getDddCelular(),
+                dto.getCelular(),
                 dto.getCep(),
                 dto.getLogradouro(),
                 dto.getNumero(),
@@ -36,6 +41,11 @@ public class PrestadorMapper {
                 dto.getNome(),
                 dto.getDocumento(),
                 dto.getTipoPessoa(),
+                dto.getEmail(),
+                dto.getDddTelefone(),
+                dto.getTelefone(),
+                dto.getDddCelular(),
+                dto.getCelular(),
                 dto.getCep(),
                 dto.getLogradouro(),
                 dto.getNumero(),
@@ -57,6 +67,12 @@ public class PrestadorMapper {
         res.setCreatedAt(p.getCriadoEm());
         res.setUpdatedAt(p.getAtualizadoEm());
 
+        res.setEmail(p.getEmail());
+        res.setDddTelefone(p.getDddTelefone());
+        res.setTelefone(p.getTelefone());
+        res.setDddCelular(p.getDddCelular());
+        res.setCelular(p.getCelular());
+
         res.setCep(p.getCep());
         res.setLogradouro(p.getLogradouro());
         res.setNumero(p.getNumero());
@@ -68,12 +84,33 @@ public class PrestadorMapper {
         return res;
     }
 
-    private void updateEntityFromDto(Prestador p, String nome, String doc, TipoPessoa tp,
-                                     String cep, String log, String num, String bai,
-                                     String cid, String uf, String comp, String logo) {
+    private void updateEntityFromDto(
+            Prestador p,
+            String nome,
+            String doc,
+            TipoPessoa tp,
+            String email,
+            String dddTelefone,
+            String telefone,
+            String dddCelular,
+            String celular,
+            String cep,
+            String log,
+            String num,
+            String bai,
+            String cid,
+            String uf,
+            String comp,
+            String logo
+    ) {
         if (UtilsString.temTexto(nome)) p.setNome(nome);
         if (UtilsString.temTexto(doc)) p.setDocumento(doc);
         if (tp != null) p.setTipoPessoa(tp);
+        if (UtilsString.temTexto(email)) p.setEmail(email);
+        if (UtilsString.temTexto(dddTelefone)) p.setDddTelefone(dddTelefone);
+        if (UtilsString.temTexto(telefone)) p.setTelefone(telefone);
+        if (UtilsString.temTexto(dddCelular)) p.setDddCelular(dddCelular);
+        if (UtilsString.temTexto(celular)) p.setCelular(celular);
         if (UtilsString.temTexto(cep)) p.setCep(cep);
         if (UtilsString.temTexto(log)) p.setLogradouro(log);
         if (UtilsString.temTexto(num)) p.setNumero(num);

@@ -19,6 +19,11 @@ public class PrestadorResponse {
     private PrestadorStatus status;
     private Instant createdAt;
     private Instant updatedAt;
+    private String email;
+    private String dddTelefone;
+    private String telefone;
+    private String dddCelular;
+    private String celular;
     private String cep;
     private String logradouro;
     private String numero;
