@@ -3,6 +3,7 @@ package br.com.codenest.marknow.entity;
 import br.com.codenest.marknow.entity.base.AbstractEntity;
 import br.com.codenest.marknow.enums.PrestadorStatus;
 import br.com.codenest.marknow.enums.TipoPessoa;
+import br.com.codenest.marknow.util.UtilsTelefone;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,21 @@ public class Prestador extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private PrestadorStatus status;
+
+    @Column(name = "email", length = 120)
+    private String email    ;
+
+    @Column(name = "ddd_telefone", length = 5)
+    private String dddTelefone;
+
+    @Column(name = "telefone", length = 30)
+    private String telefone;
+
+    @Column(name = "ddd_celular", length = 5)
+    private String dddCelular;
+
+    @Column(name = "celular", length = 30)
+    private String celular;
 
     @Column(name = "cep", length = 9)
     private String cep;
@@ -62,5 +78,9 @@ public class Prestador extends AbstractEntity {
         if (this.status == null) {
             this.status = PrestadorStatus.BLOQUEADO;
         }
+        this.dddTelefone = UtilsTelefone.apenasNumeros(this.dddTelefone);
+        this.telefone = UtilsTelefone.apenasNumeros(this.telefone);
+        this.dddCelular = UtilsTelefone.apenasNumeros(this.dddCelular);
+        this.celular = UtilsTelefone.apenasNumeros(this.celular);
     }
 }

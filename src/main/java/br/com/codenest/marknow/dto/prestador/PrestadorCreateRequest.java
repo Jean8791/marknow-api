@@ -3,6 +3,8 @@ package br.com.codenest.marknow.dto.prestador;
 import br.com.codenest.marknow.enums.TipoPessoa;
 import br.com.codenest.marknow.util.UtilsString;
 import br.com.codenest.marknow.validation.CpfOrCnpj;
+import br.com.codenest.marknow.validation.EmailStrict;
+import br.com.codenest.marknow.validation.TelefoneBrasil;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
@@ -29,6 +31,26 @@ public class PrestadorCreateRequest {
 
     @NotNull(message = "tipoPessoa é obrigatório")
     private TipoPessoa tipoPessoa;
+
+    @NotBlank
+    @EmailStrict
+    @Size(max = 120)
+    private String email;
+
+    @NotBlank
+    @Size(min = 2, max = 2, message = "DDD inválido")
+    private String dddTelefone;
+
+    @TelefoneBrasil(message = "Número de telefone fixo inválido")
+    private String telefone;
+
+    @Size(min = 2, max = 5, message = "DDD inválido")
+    private String dddCelular;
+
+    @TelefoneBrasil(message = "Número de celular inválido")
+    private String celular;
+
+    private String imagem;
 
     @Size(max = 9)
     @NotBlank(message = "CEP e obrigatorio")
@@ -73,6 +95,16 @@ public class PrestadorCreateRequest {
     @JsonSetter("tipoPessoa")
     public void setTipoPessoa(TipoPessoa tipoPessoa) {
         this.tipoPessoa = tipoPessoa;
+    }
+
+    @JsonSetter("dddTelefone")
+    public void setDddTelefone(String dddTelefone) {
+        this.dddTelefone = UtilsString.apararParaNull(dddTelefone);
+    }
+
+    @JsonSetter("dddCelular")
+    public void setDddCelular(String dddCelular) {
+        this.dddCelular = UtilsString.apararParaNull(dddCelular);
     }
 
     @JsonSetter("cep")

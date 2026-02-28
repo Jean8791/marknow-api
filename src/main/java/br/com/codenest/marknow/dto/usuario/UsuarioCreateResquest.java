@@ -2,6 +2,7 @@ package br.com.codenest.marknow.dto.usuario;
 
 import br.com.codenest.marknow.enums.PrestadorUsuarioRole;
 import br.com.codenest.marknow.util.UtilsString;
+import br.com.codenest.marknow.validation.CpfOrCnpj;
 import br.com.codenest.marknow.validation.EmailStrict;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import jakarta.validation.constraints.NotBlank;
@@ -28,6 +29,10 @@ public class UsuarioCreateResquest {
     @Size(min = 2, max = 120)
     @Schema(required = true, example = "Nome do prestador")
     private String nome;
+
+    @CpfOrCnpj
+    @Schema(example = "12345678000199")
+    private String documento;
 
     @NotBlank
     @Schema(required = true, example = "senha de acesso")
