@@ -15,9 +15,4 @@ public class PlanoRepository implements PanacheRepositoryBase<Plano, String> {
         return findById(oid);
     }
 
-    public List<Plano> findAll(int page, int size, String sort) {
-        Sort panacheSort = Sort.by(sort);
-        return findAll(panacheSort).page(page, size).list();
-    }
-
 }

@@ -1,5 +1,6 @@
 package br.com.codenest.marknow.resource;
 
+import br.com.codenest.marknow.dto.common.PageDTO;
 import br.com.codenest.marknow.dto.plano.PlanoCreateRequest;
 import br.com.codenest.marknow.dto.plano.PlanoResponse;
 import br.com.codenest.marknow.service.PlanoService;
@@ -18,7 +19,6 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import java.net.URI;
-import java.util.List;
 
 @Path("/plano")
 @Tag(name = "Plano")
@@ -53,9 +53,9 @@ public class PlanoResource {
 
     @GET
     @Operation(summary = "Listar prestadores (paginado)")
-    public List<PlanoResponse> list(@QueryParam("page") @DefaultValue("0") int page,
-                                    @QueryParam("size") @DefaultValue("20") int size,
-                                    @QueryParam("sort") @DefaultValue("criadoEm") String sort) {
+    public PageDTO<PlanoResponse> list(@QueryParam("page") @DefaultValue("0") int page,
+                                       @QueryParam("size") @DefaultValue("20") int size,
+                                       @QueryParam("sort") @DefaultValue("criadoEm") String sort) {
         auditoriaService.checkSuperAdmin();
         return planoService.list(page, size, sort);
     }

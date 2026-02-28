@@ -1,5 +1,6 @@
 package br.com.codenest.marknow.service;
 
+import br.com.codenest.marknow.dto.common.PageDTO;
 import br.com.codenest.marknow.dto.plano.PlanoCreateRequest;
 import br.com.codenest.marknow.dto.plano.PlanoResponse;
 import br.com.codenest.marknow.dto.plano.PlanoUpdateRequest;
@@ -8,6 +9,8 @@ import br.com.codenest.marknow.exception.BusinessException;
 import br.com.codenest.marknow.exception.ErrorCode;
 import br.com.codenest.marknow.mapper.PlanoMapper;
 import br.com.codenest.marknow.repository.PlanoRepository;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -46,8 +49,10 @@ public class PlanoService {
         return mapper.toResponse(plano);
     }
 
-    public List<PlanoResponse> list(int page, int size, String sort) {
-        return planoRepository.findAll(page, size, sort).stream().map(mapper::toResponse).toList();
+    public PageDTO<PlanoResponse> list(int page, int size, String sort) {
+        PanacheQuery<Plano> query = planoRepository.find("", Sort.by(sort).descending()).page(page, size);
+        List<PlanoResponse> content = query.stream().map(mapper::toResponse).toList();
+        return new PageDTO<>(content, query.count(), query.pageCount(), page, size);
     }
 
     @Transactional
