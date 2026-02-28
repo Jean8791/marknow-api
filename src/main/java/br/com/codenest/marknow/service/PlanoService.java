@@ -9,6 +9,7 @@ import br.com.codenest.marknow.exception.BusinessException;
 import br.com.codenest.marknow.exception.ErrorCode;
 import br.com.codenest.marknow.mapper.PlanoMapper;
 import br.com.codenest.marknow.repository.PlanoRepository;
+import br.com.codenest.marknow.util.UtilsString;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -36,7 +37,10 @@ public class PlanoService {
     }
 
     @Transactional
-    public PlanoResponse update(@Valid PlanoUpdateRequest req) {
+    public PlanoResponse update(String oid, @Valid PlanoUpdateRequest req) {
+        if (UtilsString.temTexto(oid) && !oid.equals(req.getOid())) {
+            throw BusinessException.of(ErrorCode.NOT_FOUND, "PLano não encontrado.");
+        }
         Plano plano = planoRepository.findByOid(req.getOid());
         validarUpdate(plano, req);
         mapper.toUpdateEntity(plano, req);

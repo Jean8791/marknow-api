@@ -3,6 +3,9 @@ package br.com.codenest.marknow.resource;
 import br.com.codenest.marknow.dto.common.PageDTO;
 import br.com.codenest.marknow.dto.plano.PlanoCreateRequest;
 import br.com.codenest.marknow.dto.plano.PlanoResponse;
+import br.com.codenest.marknow.dto.plano.PlanoUpdateRequest;
+import br.com.codenest.marknow.dto.prestador.PrestadorResponse;
+import br.com.codenest.marknow.dto.prestador.PrestadorUpdateRequest;
 import br.com.codenest.marknow.service.PlanoService;
 import br.com.codenest.marknow.service.auditoria.AuditoriaService;
 import jakarta.inject.Inject;
@@ -59,4 +62,13 @@ public class PlanoResource {
         auditoriaService.checkSuperAdmin();
         return planoService.list(page, size, sort);
     }
+
+    @PUT
+    @Path("/{oid}")
+    @Operation(summary = "Atualizar prestador")
+    public PlanoResponse update(@PathParam("oid") String oid, @Valid PlanoUpdateRequest req) {
+        auditoriaService.checkSuperAdmin();
+        return planoService.update(oid, req);
+    }
+
 }
