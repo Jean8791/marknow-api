@@ -92,11 +92,6 @@ public class PrestadorCreateRequest {
         this.documento = UtilsString.apararParaNull(documento);
     }
 
-    @JsonSetter("tipoPessoa")
-    public void setTipoPessoa(TipoPessoa tipoPessoa) {
-        this.tipoPessoa = tipoPessoa;
-    }
-
     @JsonSetter("dddTelefone")
     public void setDddTelefone(String dddTelefone) {
         this.dddTelefone = UtilsString.apararParaNull(dddTelefone);
