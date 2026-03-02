@@ -39,6 +39,9 @@ public class UsuarioUpdateResquest {
     @Schema(required = true, example = "senha de acesso")
     public String senha;
 
+    @NotBlank
+    private String comfirmarSenha;
+
     @NotNull(message = "tipoPessoa é obrigatório")
     private TipoPessoa tipoPessoa;
 

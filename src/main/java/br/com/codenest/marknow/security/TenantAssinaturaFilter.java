@@ -104,7 +104,7 @@ public class TenantAssinaturaFilter implements ContainerRequestFilter {
         }
 
         Assinatura a = assinaturaRepository.findByOidPrestador(prestadorOid);
-        if (!politica.isAtiva(a, Instant.now())) {
+        if (!politica.isAcessoLiberado(a, Instant.now())) {
             abort(ctx, "Acesso negado: Assinatura do plano expirada ou inválida");
             return;
         }

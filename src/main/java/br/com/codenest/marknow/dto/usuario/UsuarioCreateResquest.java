@@ -58,6 +58,9 @@ public class UsuarioCreateResquest {
     @Schema(required = true, example = "senha de acesso")
     private String senha;
 
+    @NotBlank
+    private String comfirmarSenha;
+
     private String imagem;
 
     private PrestadorUsuarioRole role;

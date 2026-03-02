@@ -111,6 +111,7 @@ public class CadastroService {
             assinatura.setFimPeriodoAtual(agora.plus(30, ChronoUnit.DAYS));
         }
 
+        assinatura.setToleranciaAte(agora.plus(15, ChronoUnit.DAYS));
         assinatura.setProvedor("INTERNO");
         assinaturaRepository.persist(assinatura);
 
