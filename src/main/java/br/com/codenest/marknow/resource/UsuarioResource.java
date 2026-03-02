@@ -1,5 +1,6 @@
 package br.com.codenest.marknow.resource;
 
+import br.com.codenest.marknow.dto.common.PageDTO;
 import br.com.codenest.marknow.dto.usuario.UsuarioCreateResquest;
 import br.com.codenest.marknow.dto.usuario.UsuarioResponse;
 import br.com.codenest.marknow.dto.usuario.UsuarioUpdateResquest;
@@ -55,9 +56,9 @@ public class UsuarioResource {
 
     @GET
     @Operation(summary = "Listar usuários (paginado)")
-    public List<UsuarioResponse> list(@QueryParam("page") @DefaultValue("0") int page,
-                                      @QueryParam("size") @DefaultValue("20") int size,
-                                      @QueryParam("sort") @DefaultValue("criadoEm") String sort) {
+    public PageDTO<UsuarioResponse> list(@QueryParam("page") @DefaultValue("0") int page,
+                                         @QueryParam("size") @DefaultValue("20") int size,
+                                         @QueryParam("sort") @DefaultValue("criadoEm") String sort) {
         auditoriaService.checkRoleAdminPrestador();
         return usuarioService.list(page, size, sort);
     }

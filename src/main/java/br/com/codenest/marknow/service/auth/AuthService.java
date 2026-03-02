@@ -74,7 +74,7 @@ public class AuthService {
             }
 
             Assinatura assinatura = Assinatura.find("oidPrestador", prestador.getOid()).firstResult();
-            if (!politica.isAtiva(assinatura, Instant.now())) {
+            if (!politica.isAcessoLiberado(assinatura, Instant.now())) {
                 throw BusinessException.of(ErrorCode.FORBIDDEN, "Acesso bloqueado: Verifique a assinatura do plano.");
             }
 
