@@ -1,4 +1,6 @@
 target
 .git
 .idea
-*.iml
+*.imlsrc/main/resources/jwt
+*.pem
+.env*
