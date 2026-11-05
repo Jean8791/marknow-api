@@ -5,10 +5,12 @@ import br.com.codenest.marknow.dto.plano.PlanoCreateRequest;
 import br.com.codenest.marknow.dto.plano.PlanoResponse;
 import br.com.codenest.marknow.dto.plano.PlanoUpdateRequest;
 import br.com.codenest.marknow.entity.Plano;
+import br.com.codenest.marknow.enums.PlanoStatus;
 import br.com.codenest.marknow.exception.BusinessException;
 import br.com.codenest.marknow.exception.ErrorCode;
 import br.com.codenest.marknow.mapper.PlanoMapper;
 import br.com.codenest.marknow.repository.PlanoRepository;
+import br.com.codenest.marknow.util.PaginationUtil;
 import br.com.codenest.marknow.util.UtilsString;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Sort;
@@ -18,6 +20,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Set;
 
 @ApplicationScoped
 public class PlanoService {
@@ -53,8 +56,17 @@ public class PlanoService {
         return mapper.toResponse(plano);
     }
 
-    public PageDTO<PlanoResponse> list(int page, int size, String sort) {
-        PanacheQuery<Plano> query = planoRepository.find("", Sort.by(sort).descending()).page(page, size);
+    public List<PlanoResponse> listarAtivos() {
+        return planoRepository.find("status", Sort.by("valor"), PlanoStatus.ATIVO).list().stream()
+                .map(mapper::toResponse)
+                .toList();
+    }
+
+    public PageDTO<PlanoResponse> list(int page, int size, String sort, String search) {
+        String termo = search == null || search.isBlank() ? "" : search.trim().toLowerCase();
+        PanacheQuery<Plano> query = planoRepository.find("?1 = '' or lower(nome) like concat('%', ?1, '%')",
+                Sort.by(PaginationUtil.campoOrdenacao(sort, Set.of("nome", "valor", "criadoEm"), "criadoEm")),
+                termo).page(page, size);
         List<PlanoResponse> content = query.stream().map(mapper::toResponse).toList();
         return new PageDTO<>(content, query.count(), query.pageCount(), page, size);
     }

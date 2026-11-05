@@ -22,9 +22,10 @@ public class AssinaturaResource {
     @GET
     public PageDTO<AssinaturaResponse> list(@QueryParam("page") @DefaultValue("0") int page,
                                             @QueryParam("size") @DefaultValue("10") int size,
-                                            @QueryParam("sort") @DefaultValue("criadoEm") String sort) {
+                                            @QueryParam("sort") @DefaultValue("criadoEm") String sort,
+                                       @QueryParam("search") String search) {
         auditoriaService.checkSuperAdmin();
-        return assinaturaService.list(page, size, sort);
+        return assinaturaService.list(page, size, sort, search);
     }
 
 }

@@ -40,7 +40,7 @@ public class UsuarioResource {
     @APIResponse(responseCode = "201", description = "Criado", content = @Content(schema = @Schema(implementation = UsuarioResponse.class)))
     public Response create(@Valid UsuarioCreateResquest req, @Context UriInfo uriInfo) {
         auditoriaService.checkRoleAdminPrestador();
-        UsuarioResponse created = usuarioService.create(req);
+        UsuarioResponse created = usuarioService.createNoPrestadorLogado(req);
         URI location = uriInfo.getAbsolutePathBuilder().path(created.oid).build();
         return Response.created(location).entity(created).build();
     }
@@ -58,16 +58,18 @@ public class UsuarioResource {
     @Operation(summary = "Listar usuários (paginado)")
     public PageDTO<UsuarioResponse> list(@QueryParam("page") @DefaultValue("0") int page,
                                          @QueryParam("size") @DefaultValue("20") int size,
-                                         @QueryParam("sort") @DefaultValue("criadoEm") String sort) {
+                                         @QueryParam("sort") @DefaultValue("criadoEm") String sort,
+                                         @QueryParam("search") String search) {
         auditoriaService.checkRoleAdminPrestador();
-        return usuarioService.list(page, size, sort);
+        return usuarioService.list(page, size, sort, search);
     }
 
     @PUT
+    @Path("/{oid}")
     @Operation(summary = "Atualizar usuário")
-    public UsuarioResponse update(@Valid UsuarioUpdateResquest req) {
+    public UsuarioResponse update(@PathParam("oid") String oid, @Valid UsuarioUpdateResquest req) {
         auditoriaService.checkRoleAdminPrestador();
-        return usuarioService.update(req);
+        return usuarioService.update(oid, req);
     }
 
     @DELETE

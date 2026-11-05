@@ -43,9 +43,10 @@ public class PrestadorResource {
     @Operation(summary = "Listar prestadores (paginado)")
     public PageDTO<PrestadorDetalhadoResponse> list(@QueryParam("page") @DefaultValue("0") int page,
                                                     @QueryParam("size") @DefaultValue("20") int size,
-                                                    @QueryParam("sort") @DefaultValue("criadoEm") String sort) {
+                                                    @QueryParam("sort") @DefaultValue("criadoEm") String sort,
+                                                    @QueryParam("search") String search) {
         auditoriaService.checkSuperAdmin();
-        return prestadorService.listDetailed(page, size, sort);
+        return prestadorService.listDetailed(page, size, sort, search);
     }
 
     @POST

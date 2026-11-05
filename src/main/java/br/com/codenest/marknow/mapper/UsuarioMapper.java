@@ -57,6 +57,12 @@ public class UsuarioMapper {
         usuarioResponse.setNome(usuario.getNome());
         usuarioResponse.setEmail(usuario.getEmail());
         usuarioResponse.setStatus(usuario.getStatus());
+        usuarioResponse.setTipoPessoa(usuario.getTipoPessoa());
+        usuarioResponse.setDocumento(usuario.getDocumento());
+        usuarioResponse.setDddTelefone(usuario.getDddTelefone());
+        usuarioResponse.setTelefone(usuario.getTelefone());
+        usuarioResponse.setDddCelular(usuario.getDddCelular());
+        usuarioResponse.setCelular(usuario.getCelular());
         usuarioResponse.setCreatedAt(usuario.getCriadoEm());
         usuarioResponse.setUpdatedAt(usuario.getAtualizadoEm());
 
@@ -79,7 +85,7 @@ public class UsuarioMapper {
             Boolean admin
     ) {
         if (UtilsString.temTexto(nome)) usuario.setNome(nome);
-        if (UtilsString.temTexto(email)) usuario.setEmail(email);
+        if (UtilsString.temTexto(email)) usuario.setEmail(email.trim().toLowerCase());
         if (UtilsString.temTexto(documento)) usuario.setDocumento(documento);
         if (UtilsString.temTexto(dddTelefone)) usuario.setDddTelefone(dddTelefone);
         if (UtilsString.temTexto(telefone)) usuario.setTelefone(telefone);

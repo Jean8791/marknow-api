@@ -42,18 +42,14 @@ public class AuthService {
 
     @Transactional
     public LoginResponse validarAcesso(LoginRequest req) {
-        Usuario usuario = usuarioRepository.find("email", req.email.toLowerCase()).firstResult();
+        Usuario usuario = usuarioRepository.findByEmail(req.email);
 
-        if (usuario == null) {
+        if (usuario == null || !UtilsSenha.verificar(req.senha, usuario.getSenha())) {
             throw BusinessException.of(ErrorCode.UNAUTHORIZED, "Credenciais inválidas.");
         }
 
         if (!UsuarioStatus.ATIVO.equals(usuario.getStatus())) {
             throw BusinessException.of(ErrorCode.FORBIDDEN, "Usuário bloqueado.");
-        }
-
-        if (!UtilsSenha.verificar(req.senha, usuario.getSenha())) {
-            throw BusinessException.of(ErrorCode.UNAUTHORIZED, "Credenciais inválidas.");
         }
 
         String oidPrestadorParaToken = null;

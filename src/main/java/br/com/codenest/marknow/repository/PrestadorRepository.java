@@ -11,7 +11,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class PrestadorRepository implements PanacheRepositoryBase<Prestador, String> {
 
-    public PanacheQuery<PrestadorDetalhadoResponse> findDetailed(Sort sort) {
+    public PanacheQuery<PrestadorDetalhadoResponse> findDetailed(Sort sort, String search) {
+        String termo = search == null || search.isBlank() ? "" : search.trim().toLowerCase();
         return find("select " +
                 "p.oid, " +
                 "p.nome, " +
@@ -28,7 +29,8 @@ public class PrestadorRepository implements PanacheRepositoryBase<Prestador, Str
                 "pl.diasTrial " +
                 "from Prestador p " +
                 "left join Assinatura a on a.oidPrestador = p.oid " +
-                "left join Plano pl on pl.oid = a.oidPlano", sort)
+                "left join Plano pl on pl.oid = a.oidPlano " +
+                "where (?1 = '' or lower(p.nome) like concat('%', ?1, '%') or lower(p.email) like concat('%', ?1, '%') or p.documento like concat('%', ?1, '%'))", sort, termo)
                 .project(PrestadorDetalhadoResponse.class);
     }
 

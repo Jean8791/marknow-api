@@ -1,5 +1,6 @@
 package br.com.codenest.marknow.dto.usuario;
 
+import br.com.codenest.marknow.enums.PrestadorUsuarioRole;
 import br.com.codenest.marknow.enums.TipoPessoa;
 import br.com.codenest.marknow.enums.UsuarioStatus;
 import lombok.Getter;
@@ -24,6 +25,7 @@ public class UsuarioResponse {
     private String dddCelular;
     private String celular;
     public UsuarioStatus status;
+    private PrestadorUsuarioRole role;
     public Instant createdAt;
     public Instant updatedAt;
 }

@@ -20,6 +20,17 @@ public final class UtilsRandom {
     /**
      * Número aleatório somente com dígitos (primeiro dígito não-zero).
      */
+    private static final String ALFABETO_CODIGO = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+    public static String codigo(int tamanho) {
+        if (tamanho <= 0) return "";
+        StringBuilder sb = new StringBuilder(tamanho);
+        for (int i = 0; i < tamanho; i++) {
+            sb.append(ALFABETO_CODIGO.charAt(RNG.nextInt(ALFABETO_CODIGO.length())));
+        }
+        return sb.toString();
+    }
+
     public static String numeroDigitos(int tamanho) {
         if (tamanho <= 0) return "";
         StringBuilder sb = new StringBuilder(tamanho);
