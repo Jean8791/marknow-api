@@ -57,6 +57,10 @@ public class AuditoriaService {
         }
     }
 
+    public String emailUsuarioLogadoOrNull() {
+        return (ctx.usuario != null) ? ctx.usuario.getEmail() : null;
+    }
+
     public String oidUsuarioLogadoOrNull() {
         return (ctx.usuario != null) ? ctx.usuario.getOid() : null;
     }
