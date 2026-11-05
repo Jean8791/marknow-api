@@ -7,6 +7,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalTime;
 
@@ -20,6 +22,7 @@ public class Disponibilidade extends AbstractTenantEntity {
     @Column(name = "oid_profissional", nullable = false, length = 36)
     private String oidProfissional;
 
+    @JdbcTypeCode(SqlTypes.SMALLINT)
     @Column(name = "dia_semana", nullable = false)
     private Integer diaSemana;
 

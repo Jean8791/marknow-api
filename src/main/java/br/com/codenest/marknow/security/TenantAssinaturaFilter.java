@@ -52,7 +52,7 @@ public class TenantAssinaturaFilter implements ContainerRequestFilter {
 
         String path = ctx.getUriInfo().getPath();
 
-        if (path.startsWith("/auth")) return;
+        if (path.startsWith("/auth") || path.isEmpty() || path.equals("/")) return;
 
         String usuarioOid = jwtUtil.getUsuarioOidOrNull();
         if (usuarioOid == null) {

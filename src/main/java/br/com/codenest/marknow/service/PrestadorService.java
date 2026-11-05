@@ -16,6 +16,7 @@ import br.com.codenest.marknow.repository.PrestadorRepository;
 import br.com.codenest.marknow.repository.PrestadorUsuarioRepository;
 import br.com.codenest.marknow.repository.UsuarioRepository;
 import br.com.codenest.marknow.service.auditoria.AuditoriaService;
+import br.com.codenest.marknow.service.demo.DemoConfig;
 import br.com.codenest.marknow.util.PaginationUtil;
 import br.com.codenest.marknow.util.UtilsString;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
@@ -41,6 +42,9 @@ public class PrestadorService {
     AuditoriaService auditoriaService;
 
     @Inject
+    DemoConfig demoConfig;
+
+    @Inject
     AssinaturaRepository assinaturaRepository;
 
     @Inject
@@ -64,6 +68,7 @@ public class PrestadorService {
             throw BusinessException.of(ErrorCode.NOT_FOUND, "Prestador não encontrado.");
         }
         Prestador prestador = buscarPrestadorLogado(oid);
+        demoConfig.bloquearSeDemo(auditoriaService.emailUsuarioLogadoOrNull(), "Os dados do prestador de demonstração não podem ser alterados.");
         validacaoUpdate(prestador, req);
         mapper.toUpdateEntity(prestador, req);
 

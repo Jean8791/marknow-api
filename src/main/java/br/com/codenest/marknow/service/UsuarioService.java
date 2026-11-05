@@ -13,6 +13,7 @@ import br.com.codenest.marknow.mapper.UsuarioMapper;
 import br.com.codenest.marknow.repository.PrestadorUsuarioRepository;
 import br.com.codenest.marknow.repository.UsuarioRepository;
 import br.com.codenest.marknow.service.auditoria.AuditoriaService;
+import br.com.codenest.marknow.service.demo.DemoConfig;
 import br.com.codenest.marknow.util.UtilsSenha;
 import br.com.codenest.marknow.util.UtilsString;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
@@ -41,6 +42,9 @@ public class UsuarioService {
     @Inject
     AuditoriaService auditoriaService;
 
+    @Inject
+    DemoConfig demoConfig;
+
     @Transactional
     public UsuarioResponse createNoPrestadorLogado(@Valid UsuarioCreateResquest req) {
         req.setOidPrestador(auditoriaService.oidPrestadorLogadoOrThrow());
@@ -65,6 +69,7 @@ public class UsuarioService {
             throw BusinessException.of(ErrorCode.NOT_FOUND, "Usuário não encontrado.");
         }
         Usuario usuario = buscarNoPrestadorLogado(oid);
+        demoConfig.bloquearSeDemo(usuario.getEmail(), "O usuário de demonstração não pode ser alterado.");
         PrestadorUsuario vinculo = vinculoNoPrestadorLogado(usuario.getOid());
         validacaoUpdate(usuario, vinculo, req);
 
@@ -94,6 +99,7 @@ public class UsuarioService {
     @Transactional
     public void delete(String oid) {
         Usuario usuario = buscarNoPrestadorLogado(oid);
+        demoConfig.bloquearSeDemo(usuario.getEmail(), "O usuário de demonstração não pode ser excluído.");
         if (isUsuarioLogado(usuario)) {
             throw BusinessException.of(ErrorCode.UNPROCESSABLE, "Você não pode excluir o próprio usuário.");
         }
