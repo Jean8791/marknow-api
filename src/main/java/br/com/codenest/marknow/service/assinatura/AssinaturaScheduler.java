@@ -29,6 +29,7 @@ public class AssinaturaScheduler {
 
         for (Assinatura a : assinaturas) {
             if (a.getOidPrestador() == null) continue;
+            if (AssinaturaStatus.CANCELADA.equals(a.getStatus()) || AssinaturaStatus.SUSPENSA.equals(a.getStatus())) continue;
 
             Prestador p = Prestador.findById(a.getOidPrestador());
             if (p == null) continue;

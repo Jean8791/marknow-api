@@ -4,12 +4,15 @@ import br.com.codenest.marknow.dto.auth.LoginRequest;
 import br.com.codenest.marknow.dto.auth.LoginResponse;
 import br.com.codenest.marknow.dto.cadastro.CadastroCreateRequest;
 import br.com.codenest.marknow.dto.cadastro.CadastroResponse;
+import br.com.codenest.marknow.dto.plano.PlanoResponse;
 import br.com.codenest.marknow.service.CadastroService;
+import br.com.codenest.marknow.service.PlanoService;
 import br.com.codenest.marknow.service.auth.AuthService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -23,6 +26,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 
 import java.net.URI;
+import java.util.List;
 
 @Path("/auth")
 @PermitAll
@@ -35,6 +39,16 @@ public class AuthResource {
 
     @Inject
     CadastroService cadastroService;
+
+    @Inject
+    PlanoService planoService;
+
+    @GET
+    @Path("/planos")
+    @Operation(summary = "Planos ativos disponíveis para cadastro")
+    public List<PlanoResponse> planosAtivos() {
+        return planoService.listarAtivos();
+    }
 
     @POST
     @Path("/login")

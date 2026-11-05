@@ -47,7 +47,7 @@ public class Convite extends AbstractEntity {
 
     @PrePersist
     void beforePersist() {
-        if (this.codigo == null) this.codigo = UtilsRandom.numeroDigitos(6).toUpperCase();
+        if (this.codigo == null) this.codigo = UtilsRandom.codigo(10);
         if (this.maxUsos == null) this.maxUsos = 1;
         if (this.qtdUsado == null) this.qtdUsado = 0;
         if (this.expiraEm == null) this.expiraEm = Instant.now().plus(30, ChronoUnit.DAYS);

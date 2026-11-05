@@ -17,8 +17,10 @@ O front-end está em [marknow-web](https://github.com/Jean8791/marknow-web).
 
 ## Funcionalidades
 
-- **Autenticação:** login com JWT e cadastro de prestador a partir de um **convite de uso único**.
-- **Multi-tenant:** um filtro de requisição identifica o usuário e o prestador pelo token, confere se o usuário está ativo e se a assinatura do prestador permite o acesso. O super admin opera fora do tenant.
+- **Autenticação:** login com JWT e cadastro de prestador a partir de um **convite** (código alfanumérico de 10 caracteres, com validade e limite de usos), escolhendo um dos planos ativos (`GET /auth/planos`).
+- **Limite de tentativas:** `POST /auth/*` aceita 10 tentativas por IP a cada 15 minutos (configurável); acima disso responde `429` com `Retry-After`.
+- **Multi-tenant:** um filtro de requisição identifica o usuário e o prestador pelo token, confere se o usuário está ativo e se a assinatura do prestador permite o acesso. Usuários e dados do prestador só são encontrados dentro do prestador logado; o super admin opera fora do tenant.
+- **Perfis:** super admin (plataforma), `ADMIN` e `OPERACIONAL` (por prestador). O admin do prestador gerencia os usuários da unidade, mas não pode excluir nem bloquear a si mesmo.
 - **Planos e assinaturas:** planos configuráveis pelo super admin e assinaturas com ciclo `TRIAL → ATIVA → ATRASADO → INADIMPLENTE`, além de `SUSPENSA` e `CANCELADA`.
 - **Cobrança automática de status:** um job agendado a cada 5 minutos verifica vencimento e período de tolerância. Passado o vencimento, a assinatura fica atrasada; passada a tolerância, ela fica inadimplente e o prestador é bloqueado.
 - **Cadastros:** prestadores (com logo e endereço), usuários e convites.
@@ -46,19 +48,22 @@ br.com.codenest.marknow
 | Recurso | Rotas |
 |---|---|
 | Autenticação | `POST /auth/login` · `POST /auth/cadastro` |
-| Prestadores | `GET/POST /prestador` · `GET/PUT/DELETE /prestador/{oid}` |
-| Usuários | `GET/POST /usuario` · `GET/DELETE /usuario/{oid}` · `PUT /usuario` |
-| Planos | `GET/POST /plano` · `GET/PUT /plano/{oid}` |
-| Assinaturas | `GET /assinatura` |
-| Convites | `GET/POST /convite` |
+| Autenticação (públicas) | `GET /auth/planos` |
+| Prestadores | `GET/POST /prestador` · `DELETE /prestador/{oid}` (super admin) · `GET/PUT /prestador/{oid}` (admin do próprio prestador) |
+| Usuários | `GET/POST /usuario` · `GET/PUT/DELETE /usuario/{oid}` (admin do prestador) |
+| Planos | `GET/POST /plano` · `GET/PUT /plano/{oid}` (super admin) |
+| Assinaturas | `GET /assinatura` (super admin) |
+| Convites | `GET/POST /convite` (super admin) |
 
-Com a aplicação rodando em dev, a documentação interativa fica em `http://localhost:9696/q/swagger-ui`.
+As listagens são paginadas (`page`, `size`), aceitam `search` e ordenam apenas por campos de uma lista permitida (`sort`).
+
+A documentação interativa fica em `/q/swagger-ui` (em dev, `http://localhost:9696/q/swagger-ui`).
 
 ## Como rodar
 
 ### Pré-requisitos
 
-- JDK 17+
+- JDK 17+ (compila também no JDK 25)
 - Docker e Docker Compose
 
 ### 1. Subir os bancos
@@ -97,9 +102,23 @@ rm rsaPrivateKey.pem
 ./mvnw quarkus:dev
 ```
 
-A API sobe em `http://localhost:9696`. Em dev, o Flyway roda as migrations na inicialização e cria um super admin de bootstrap (veja `V6__insert_user.sql`). Troque essa senha antes de usar em qualquer ambiente que não seja o local.
+A API sobe em `http://localhost:9696`. O Flyway roda as migrations na inicialização e cria um super admin de bootstrap (`admin@marknow.com.br`, veja `V6__insert_user.sql`), com a senha `admin123` só para uso local. Planos novos nascem inativos: ative um plano antes de testar o cadastro por convite.
+
+### Variáveis de ambiente (produção)
+
+| Variável | Uso |
+|---|---|
+| `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD`, `DB_SSLMODE` | Conexão com o PostgreSQL |
+| `MARKNOW_JWT_PRIVATE_KEY_LOCATION`, `MARKNOW_JWT_PUBLIC_KEY_LOCATION` | Caminho das chaves JWT fora do classpath |
+| `MARKNOW_SUPER_ADMIN_SENHA` | Senha do super admin. Em produção, se não for definida e a senha ainda for a padrão, o super admin é bloqueado na inicialização |
+| `CORS_ORIGINS` | Origens liberadas para o front (padrão `http://localhost:3000`) |
+| `MARKNOW_AUTH_CABECALHO_IP` | Cabeçalho com o IP real do cliente atrás de proxy (ex.: `CF-Connecting-IP`) |
+| `MARKNOW_AUTH_LIMITE_TENTATIVAS`, `MARKNOW_AUTH_JANELA_MINUTOS` | Limite de tentativas em `/auth` |
+| `PORT` | Porta HTTP (padrão `9696`) |
 
 ### Testes
+
+Testes unitários, não precisam de banco:
 
 ```bash
 ./mvnw test

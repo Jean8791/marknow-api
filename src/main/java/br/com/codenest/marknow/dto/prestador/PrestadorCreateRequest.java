@@ -77,7 +77,6 @@ public class PrestadorCreateRequest {
     private String uf;
 
     @Size(max = 100)
-    @NotBlank(message = "Complemento e obrigatorio")
     private String complemento;
 
     private String logoUrl;

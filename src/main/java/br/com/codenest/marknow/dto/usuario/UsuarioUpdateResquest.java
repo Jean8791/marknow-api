@@ -1,5 +1,6 @@
 package br.com.codenest.marknow.dto.usuario;
 
+import br.com.codenest.marknow.enums.PrestadorUsuarioRole;
 import br.com.codenest.marknow.enums.TipoPessoa;
 import br.com.codenest.marknow.enums.UsuarioStatus;
 import br.com.codenest.marknow.util.UtilsString;
@@ -22,7 +23,6 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 @Schema(name = "UserUpdateRequest")
 public class UsuarioUpdateResquest {
 
-    @NotBlank
     public String oid;
 
     @NotBlank
@@ -35,12 +35,12 @@ public class UsuarioUpdateResquest {
     @Schema(required = true, example = "Nome do prestador")
     public String nome;
 
-    @NotBlank
-    @Schema(required = true, example = "senha de acesso")
+    @Schema(description = "Preencha apenas para trocar a senha", example = "nova senha")
     public String senha;
 
-    @NotBlank
     private String comfirmarSenha;
+
+    private PrestadorUsuarioRole role;
 
     @NotNull(message = "tipoPessoa é obrigatório")
     private TipoPessoa tipoPessoa;

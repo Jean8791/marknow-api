@@ -58,9 +58,10 @@ public class PlanoResource {
     @Operation(summary = "Listar prestadores (paginado)")
     public PageDTO<PlanoResponse> list(@QueryParam("page") @DefaultValue("0") int page,
                                        @QueryParam("size") @DefaultValue("20") int size,
-                                       @QueryParam("sort") @DefaultValue("criadoEm") String sort) {
+                                       @QueryParam("sort") @DefaultValue("criadoEm") String sort,
+                                       @QueryParam("search") String search) {
         auditoriaService.checkSuperAdmin();
-        return planoService.list(page, size, sort);
+        return planoService.list(page, size, sort, search);
     }
 
     @PUT

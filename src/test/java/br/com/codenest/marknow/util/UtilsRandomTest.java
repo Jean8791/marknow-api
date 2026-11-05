@@ -17,6 +17,18 @@ class UtilsRandomTest {
     }
 
     @Test
+    void codigo_deveTerTamanhoCertoESemCaracteresAmbiguos() {
+        String c = UtilsRandom.codigo(10);
+        assertEquals(10, c.length());
+        assertTrue(c.matches("[A-HJ-NP-Z2-9]+"));
+    }
+
+    @Test
+    void codigo_quandoTamanhoInvalido_retornaVazio() {
+        assertEquals("", UtilsRandom.codigo(0));
+    }
+
+    @Test
     void numeroDigitos_quandoTamanhoInvalido_retornaVazio() {
         assertEquals("", UtilsRandom.numeroDigitos(0));
         assertEquals("", UtilsRandom.numeroDigitos(-1));

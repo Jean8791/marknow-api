@@ -8,6 +8,7 @@ import br.com.codenest.marknow.entity.Assinatura;
 import br.com.codenest.marknow.entity.Convite;
 import br.com.codenest.marknow.entity.Plano;
 import br.com.codenest.marknow.enums.AssinaturaStatus;
+import br.com.codenest.marknow.enums.PlanoStatus;
 import br.com.codenest.marknow.enums.PrestadorUsuarioRole;
 import br.com.codenest.marknow.exception.BusinessException;
 import br.com.codenest.marknow.exception.ErrorCode;
@@ -56,7 +57,7 @@ public class CadastroService {
             throw BusinessException.of(ErrorCode.UNPROCESSABLE, "Payload inválido (usuario e prestador são obrigatórios).");
         }
 
-        Convite convite = conviteRepository.findByCodigo(req.getCodigo());
+        Convite convite = conviteRepository.findByCodigo(req.getCodigo() == null ? null : req.getCodigo().trim().toUpperCase());
 
         if (convite == null) {
             throw BusinessException.of(ErrorCode.NOT_FOUND, "Convite inválido ou inexistente.");
@@ -70,8 +71,8 @@ public class CadastroService {
             throw BusinessException.of(ErrorCode.FORBIDDEN, "Este convite já atingiu o limite de usos.");
         }
 
-        if (UtilsString.temTexto(convite.getEmailDestinatario()) && !convite.getEmailDestinatario().equals(req.getUsuario().getEmail())) {
-            throw BusinessException.of(ErrorCode.FORBIDDEN, "E-mail nao corresponde ao convite");
+        if (UtilsString.temTexto(convite.getEmailDestinatario()) && !convite.getEmailDestinatario().trim().equalsIgnoreCase(String.valueOf(req.getUsuario().getEmail()).trim())) {
+            throw BusinessException.of(ErrorCode.FORBIDDEN, "E-mail não corresponde ao convite.");
         }
 
         String email = req.getUsuario().getEmail();
@@ -85,7 +86,7 @@ public class CadastroService {
 
         Plano plano = planoRepository.findByOid(req.getOidPlano());
 
-        if (plano == null) {
+        if (plano == null || plano.getStatus() == PlanoStatus.INATIVO) {
             throw BusinessException.of(ErrorCode.UNPROCESSABLE, "Plano inválido");
         }
 
@@ -118,7 +119,7 @@ public class CadastroService {
         convite.setQtdUsado(convite.getQtdUsado() + 1);
         conviteRepository.persist(convite);
 
-        String token = jwtUtil.gerarToken(prestador.getOid(), usuario.getOid(), email, PrestadorUsuarioRole.ADMIN);
+        String token = jwtUtil.gerarToken(prestador.getOid(), usuario.getOid(), usuario.getEmail(), PrestadorUsuarioRole.ADMIN);
 
         return new CadastroResponse(prestador.getOid(), token);
     }
