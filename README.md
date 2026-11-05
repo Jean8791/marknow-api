@@ -4,7 +4,7 @@ API do **MarkNow**, um SaaS de agenda para prestadores de serviço (salões, cl�
 
 O front-end está em [marknow-web](https://github.com/Jean8791/marknow-web).
 
-> **Status:** MVP em desenvolvimento. A base de contas, planos, assinaturas e convites está pronta; o módulo de agenda é a próxima fase. O escopo completo está no [PRD](docs/PRD.md) e as decisões técnicas em [DECISIONS.md](DECISIONS.md).
+> **Status:** MVP funcional. Contas, planos, assinaturas, convites e a agenda interna (profissionais, serviços, disponibilidade e agendamentos) estão prontos. O escopo completo está no [PRD](docs/PRD.md) e as decisões técnicas em [DECISIONS.md](DECISIONS.md).
 
 ## Stack
 
@@ -22,6 +22,15 @@ O front-end está em [marknow-web](https://github.com/Jean8791/marknow-web).
 - **Multi-tenant:** um filtro de requisição identifica o usuário e o prestador pelo token, confere se o usuário está ativo e se a assinatura do prestador permite o acesso. Usuários e dados do prestador só são encontrados dentro do prestador logado; o super admin opera fora do tenant.
 - **Perfis:** super admin (plataforma), `ADMIN` e `OPERACIONAL` (por prestador). O admin do prestador gerencia os usuários da unidade, mas não pode excluir nem bloquear a si mesmo.
 - **Planos e assinaturas:** planos configuráveis pelo super admin e assinaturas com ciclo `TRIAL → ATIVA → ATRASADO → INADIMPLENTE`, além de `SUSPENSA` e `CANCELADA`.
+- **Agenda interna (slots de 30 minutos):**
+  - **profissionais** com disponibilidade semanal em janelas (ex.: seg 08:00–12:00 e 14:00–18:00), sempre em :00 ou :30;
+  - **serviços** com duração múltipla de 30 minutos;
+  - **agendamentos** com cliente (nome e WhatsApp) obrigatório: criar, remarcar (horário e/ou profissional) e cancelar, sempre dentro da disponibilidade e nunca no passado;
+  - cálculo de **horários livres** por profissional, serviço e data;
+  - **sem sobreposição garantida no banco:** constraint `EXCLUDE USING gist` com `tstzrange(inicio, fim)` por profissional, valendo só para agendamentos ativos. A API confere antes e, se duas requisições concorrentes passarem juntas, o Postgres barra a segunda (SQLSTATE `23P01`), que vira `409`;
+  - **quota mensal do plano:** aviso a partir de 80% e bloqueio de novos agendamentos em 100%;
+  - **WhatsApp manual:** o front monta o link `wa.me` com a mensagem pronta e a API registra o status (`NAO_ENVIADO` / `ENVIADO_MANUAL`);
+  - fuso fixo `America/Sao_Paulo`: a API recebe e devolve horários locais (`2026-11-10T09:00`) e grava `timestamptz`.
 - **Cobrança automática de status:** um job agendado a cada 5 minutos verifica vencimento e período de tolerância. Passado o vencimento, a assinatura fica atrasada; passada a tolerância, ela fica inadimplente e o prestador é bloqueado.
 - **Cadastros:** prestadores (com logo e endereço), usuários e convites.
 - **Validações próprias:** CPF/CNPJ, telefone brasileiro e e-mail.
@@ -32,7 +41,7 @@ O front-end está em [marknow-web](https://github.com/Jean8791/marknow-web).
 ```
 br.com.codenest.marknow
 ├── resource/     endpoints REST
-├── service/      regras de negócio (auth, assinatura, convite, cadastro...)
+├── service/      regras de negócio (auth, assinatura, convite, cadastro, agenda...)
 ├── repository/   acesso a dados com Panache
 ├── entity/       entidades JPA (com entidade base por tenant)
 ├── dto/          requests e responses por domínio
@@ -54,6 +63,9 @@ br.com.codenest.marknow
 | Planos | `GET/POST /plano` · `GET/PUT /plano/{oid}` (super admin) |
 | Assinaturas | `GET /assinatura` (super admin) |
 | Convites | `GET/POST /convite` (super admin) |
+| Profissionais | `GET /profissional` · `GET /profissional/{oid}` (admin e operacional) · `POST /profissional` · `PUT/DELETE /profissional/{oid}` (admin) |
+| Serviços | `GET /servico` · `GET /servico/{oid}` (admin e operacional) · `POST /servico` · `PUT/DELETE /servico/{oid}` (admin) |
+| Agendamentos | `GET /agendamento?de=&ate=&oidProfissional=` · `GET /agendamento/horarios-livres` · `GET /agendamento/uso` · `POST /agendamento` · `PUT /agendamento/{oid}/remarcar` · `POST /agendamento/{oid}/cancelar` · `POST /agendamento/{oid}/whatsapp-enviado` (admin e operacional) |
 
 As listagens são paginadas (`page`, `size`), aceitam `search` e ordenam apenas por campos de uma lista permitida (`sort`).
 
@@ -102,7 +114,7 @@ rm rsaPrivateKey.pem
 ./mvnw quarkus:dev
 ```
 
-A API sobe em `http://localhost:9696`. O Flyway roda as migrations na inicialização e cria um super admin de bootstrap (`admin@marknow.com.br`, veja `V6__insert_user.sql`), com a senha `admin123` só para uso local. Planos novos nascem inativos: ative um plano antes de testar o cadastro por convite.
+A API sobe em `http://localhost:9696`. O Flyway roda as migrations na inicialização e cria um super admin de bootstrap (`admin@marknow.com.br`, veja `V6__insert_user.sql`), com a senha `admin123` só para uso local. Planos novos nascem inativos: ative um plano antes de testar o cadastro por convite. A migration `V11__agenda.sql` cria a extensão `btree_gist`, usada pela constraint de não sobreposição; o usuário do banco precisa de permissão para criar extensões (o Postgres do `docker-compose` e o Neon permitem).
 
 ### Variáveis de ambiente (produção)
 
