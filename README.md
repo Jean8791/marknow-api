@@ -6,6 +6,13 @@ O front-end está em [marknow-web](https://github.com/Jean8791/marknow-web).
 
 > **Status:** MVP funcional. Contas, planos, assinaturas, convites e a agenda interna (profissionais, serviços, disponibilidade e agendamentos) estão prontos. O escopo completo está no [PRD](docs/PRD.md) e as decisões técnicas em [DECISIONS.md](DECISIONS.md).
 
+## Demonstração online
+
+- **Aplicação:** https://marknow-web.vercel.app (botão "Entrar como visitante", ou `demo@marknow.com` / `demo1234`)
+- **API e Swagger:** https://marknow-back.onrender.com (a raiz abre o Swagger)
+
+> Projeto acadêmico, para fins de estudo. Os dados da demonstração são fictícios e a agenda é preenchida automaticamente. A API roda no plano gratuito do Render e hiberna sem uso: a primeira requisição pode levar alguns segundos.
+
 ## Stack
 
 - **Java 17** e **Quarkus 3**
