@@ -127,6 +127,8 @@ A API sobe em `http://localhost:9696`. O Flyway roda as migrations na inicializa
 | `MARKNOW_AUTH_CABECALHO_IP` | Cabeçalho com o IP real do cliente atrás de proxy (ex.: `CF-Connecting-IP`) |
 | `MARKNOW_AUTH_LIMITE_TENTATIVAS`, `MARKNOW_AUTH_JANELA_MINUTOS` | Limite de tentativas em `/auth` |
 | `PORT` | Porta HTTP (padrão `9696`) |
+| `MARKNOW_DEMO_EMAIL` | E-mail da conta de demonstração: fica protegida contra alteração e tem a agenda preenchida automaticamente |
+| `MARKNOW_ATRAS_DE_PROXY` | `true` quando a API roda atrás de proxy com TLS (Render), para usar os cabeçalhos `X-Forwarded-*` |
 
 ### Testes
 
