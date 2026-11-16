@@ -35,6 +35,9 @@ import java.util.List;
 public class AgendamentoService {
 
     private static final String SQLSTATE_EXCLUSAO = "23P01";
+    // Em inserts simultâneos no mesmo horário o Postgres pode abortar uma transação por deadlock
+    // em vez de violação de exclusão. Para o cliente é o mesmo caso: o horário já foi tomado.
+    private static final String SQLSTATE_DEADLOCK = "40P01";
     private static final int MAX_DIAS_CONSULTA = 31;
     private static final int PERCENTUAL_ALERTA = 80;
 
@@ -209,20 +212,24 @@ public class AgendamentoService {
         try {
             repo.flush();
         } catch (PersistenceException e) {
-            if (violouExclusao(e)) {
+            if (conflitoDeHorario(e)) {
                 throw BusinessException.of(ErrorCode.CONFLICT, "O profissional já tem um agendamento nesse horário.");
             }
             throw e;
         }
     }
 
-    private boolean violouExclusao(Throwable e) {
+    static boolean conflitoDeHorario(Throwable e) {
         for (Throwable t = e; t != null; t = t.getCause()) {
-            if (t instanceof SQLException sql && SQLSTATE_EXCLUSAO.equals(sql.getSQLState())) {
+            if (t instanceof SQLException sql && ehConflitoDeHorario(sql.getSQLState())) {
                 return true;
             }
         }
         return false;
+    }
+
+    private static boolean ehConflitoDeHorario(String sqlState) {
+        return SQLSTATE_EXCLUSAO.equals(sqlState) || SQLSTATE_DEADLOCK.equals(sqlState);
     }
 
     private void definirPeriodo(Agendamento agendamento, LocalDateTime inicio, Servico servico) {
